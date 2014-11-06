@@ -12,7 +12,10 @@ defmodule Hmc5883l.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger]]
+    [
+      applications: [:logger],
+      registered: [:hmc5883l]
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -25,6 +28,8 @@ defmodule Hmc5883l.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    [
+     {:elixir_ale, "~>0.2"}
+    ]
   end
 end
