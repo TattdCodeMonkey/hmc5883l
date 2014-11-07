@@ -12,9 +12,9 @@ Current design is
 	Supervisor
 	    |
 	   / \
-	 /     \
+	  /    \
 	Heading Server (holds latest valid heading read)
-		 \
-		  Compass Supervisor
-		  |
-		  Compass Server (Handle all interaction with compass over i2c)
+		   \
+		    Compass Supervisor
+		    |
+		    Compass Server (Handle all interaction with compass over i2c)
