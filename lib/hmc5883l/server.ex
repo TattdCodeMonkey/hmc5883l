@@ -87,29 +87,20 @@ defmodule HMC5884L.Server do
   end
 
   defp write_scale(state, scale) do
-    state.i2c.write(state.i2c_pid, 0x01, <<scale>>)
+    state.i2c.write(state.i2c_pid, 0x01, <<HMC5883L.Utilities.get_gainvalue(scale)>>)
+    config = state.config
+    config = %{config| scale: scale}
+    state  = %{state| config: config}
+    state
   end
 
   defp read_heading_from_i2c(state) do
     state.i2c.write(state.i2c_pid,0x03)
     :timer.sleep(1)
-    <<x_raw :: size(16), z_raw :: size(16), y_raw :: size(16)>> =
-      state.i2c.read(state.i2c_pid, 6)
-    x_out = x_raw * state.config.scale_value
-    y_out = y_raw * state.config.scale_value
-    z_out = z_raw * state.config.scale_value
-
-    :math.atan2(y_out,x_out)
-    |> bearingToDegrees    
+    state.i2c.read(state.i2c_pid, 6)
+    |> HMC5883L.InterfaceControl.decodeHeading(state.config.scale)     
   end
-
-  defp bearingToDegrees(rBearing) when rBearing < 0 do
-    rBearing + (2 * :math.pi)
-    |> bearingToDegrees
-  end
-  defp bearingToDegrees(rBearing) do
-    rBearing * (180 / :math.pi)
-  end 
+   
   ## Send data to HeadingServer
   defp update_heading(state) do
     HeadingServer.update_value(state.heading_srv, state.heading)
