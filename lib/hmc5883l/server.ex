@@ -13,8 +13,8 @@ defmodule HMC5884L.Server do
 
   #####
   # GenServer implementation
-  def init([hdgSrv, i2cMod, i2c_config]) do
-    {:ok , %{heading_srv: hdgSrv, i2c: i2cMod, config: i2c_config}}
+  def init([hdgSrv, i2cMod, config]) do
+    {:ok , %{heading_srv: hdgSrv, i2c: i2cMod, config: config}}
   end
 
   def handle_cast({:initialize}, state) do
@@ -55,7 +55,7 @@ defmodule HMC5884L.Server do
     {:ok, i2cPid} = state.i2c.start_link(state.config.i2c_channel,state.config.i2c_devid)
     state = %{state| i2c_pid: i2cPid}
     #write config. TODO: Change these for configured values
-    write_config(state, <<0b01110000, 0b00100000, 0x00>>) 
+    write_config(state) 
     #read heading
     state = read_heading(state)
     #set timer for reading header
@@ -78,18 +78,25 @@ defmodule HMC5884L.Server do
     state
   end
   
-  defp write_config(state, <<_,_,_>> = cfgBytes) do
-    state.i2c.write(state.i2c_pid,0x00,cfgBytes)
+  defp write_config(state) do
+    state.i2c.write(state.i2c_pid,0x00, HMC5883L.InterfaceControl.encode_config(state.config))
   end 
 
   defp write_mode(state, value) do
-    state.i2c.write(state.i2c_pid, 0x02, <<value>>)
+    state.i2c.write(state.i2c_pid, 0x02, HMC5883L.InterfaceControl.encode_modereg(value))
+
+    config = state.config
+    config = %{config| mode: value}
+    #TODO: update config to be saved somewhere??
+    state  = %{state| config: config}
+    state
   end
 
-  defp write_scale(state, scale) do
-    state.i2c.write(state.i2c_pid, 0x01, <<HMC5883L.Utilities.get_gainvalue(scale)>>)
+  defp write_gain(state, gain) do
+    state.i2c.write(state.i2c_pid, 0x01, HMC5883L.InterfaceControl.encode_cfgb(gain))
     config = state.config
-    config = %{config| scale: scale}
+    config = %{config| gain: gain}
+    #TODO: update config to be saved somewhere??
     state  = %{state| config: config}
     state
   end
@@ -98,7 +105,7 @@ defmodule HMC5884L.Server do
     state.i2c.write(state.i2c_pid,0x03)
     :timer.sleep(1)
     state.i2c.read(state.i2c_pid, 6)
-    |> HMC5883L.InterfaceControl.decodeHeading(state.config.scale)     
+    |> HMC5883L.InterfaceControl.decodeHeading(state.config.gain)     
   end
    
   ## Send data to HeadingServer

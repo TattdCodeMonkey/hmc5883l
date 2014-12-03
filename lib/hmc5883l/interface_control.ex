@@ -6,15 +6,16 @@ defmodule HMC5883L.InterfaceControl do
   @bias_bit_len   2
   @gain_bit_len   3
   @mode_bit_len   2
+  @high_spd_i2c   1
 
   @cfga_spare_bit_len 1
   @cfgb_spare_bit_len 5 
-  @mdrg_spare_bit_len 6
+  @mdrg_spare_bit_len 5
 
   def decode_config(<<cfga,cfgb,modeReg>>) do
-    regA    = cfga    |> decode_cfga
-    regB    = cfgb    |> decode_cfgb
-    regMode = modeReg |> decode_modereg
+    regA    = <<cfga>>    |> decode_cfga
+    regB    = <<cfgb>>    |> decode_cfgb
+    regMode = <<modeReg>> |> decode_modereg
     regA |> Map.merge regB |> Map.merge regMode
   end
 
@@ -23,7 +24,7 @@ defmodule HMC5883L.InterfaceControl do
     cfgb = config |> encode_cfgb
     modereg = config |> encode_modereg
 
-    <<cfga, cfgb, modereg>>
+    cfga <> cfgb <> modereg
   end
 
   ######### 
@@ -36,11 +37,11 @@ defmodule HMC5883L.InterfaceControl do
     bsDR    = <<enc_datarate(rate)::size(@drate_bit_len)>>
     bsBias  = <<enc_bias(bias)::size(@bias_bit_len)>>
     bsSpare = <<0::size(@cfga_spare_bit_len)>>
-    <<bsAvg::bitstring, bsDR::bitstring, bsBias::bitstring, bsSpare::bitstring>>
+    <<bsSpare::bitstring, bsAvg::bitstring, bsDR::bitstring, bsBias::bitstring>>
   end
 
   def decode_cfga(cfga) do
-    <<bsAvg::size(@avg_bit_len), bsDataRate::size(@drate_bit_len), bsBias::size(@bias_bit_len), _::size(@cfga_spare_bit_len)>> = cfga
+    <<_::size(@cfga_spare_bit_len), bsAvg::size(@avg_bit_len), bsDataRate::size(@drate_bit_len), bsBias::size(@bias_bit_len)>> = cfga
     averaging = dec_samplingavg(bsAvg)
     dataRate  = dec_datarate(bsDataRate)
     bias      = dec_bias(bsBias)
@@ -66,26 +67,27 @@ defmodule HMC5883L.InterfaceControl do
   ######### 
   ###  Mode Register 
   ########## 
-  def default_modereg(), do: encode_modereg(:single)
+  def default_modereg(), do: encode_modereg(:continuous)
   def encode_modereg(%{mode: mode}), do: encode_modereg(mode)
   def encode_modereg(mode) do
+    bsHighSpeedI2c = <<0::size(@high_spd_i2c)>> #always zero for now
     bsMode  = <<enc_mode(mode)::size(@mode_bit_len)>>
     bsSpare = <<0::size(@mdrg_spare_bit_len)>>
-    <<bsSpare::bitstring, bsMode::bitstring>>
+    <<bsHighSpeedI2c::bitstring, bsSpare::bitstring, bsMode::bitstring>>
   end
 
   def decode_modereg(modeReg) do
-    <<_::size(@mdrg_spare_bit_len), bsMode::size(@mode_bit_len)>> = modeReg
+    <<_::size(@high_spd_i2c), _::size(@mdrg_spare_bit_len), bsMode::size(@mode_bit_len)>> = modeReg
     %{mode: dec_mode(bsMode)}
   end
 
   ######### 
   ###  Heading decode
   ########## 
-  def decodeHeading(<<x_raw :: size(16), z_raw :: size(16), y_raw :: size(16)>>, scale) do
-    x_out = x_raw * scale
-    y_out = y_raw * scale
-    z_out = z_raw * scale
+  def decodeHeading(<<x_raw :: size(16), z_raw :: size(16), y_raw :: size(16)>>, gain) do
+    x_out = x_raw * gain
+    y_out = y_raw * gain
+    z_out = z_raw * gain
 
     :math.atan2(y_out,x_out)
     |> bearingToDegrees   
