@@ -18,3 +18,8 @@ Current design is
 		    Compass Supervisor
 		    |
 		    Compass Server (Handle all interaction with compass over i2c)
+
+
+Further unit tests are needed.
+All code is functioning, but reading from compass do not seem correct.
+Will require further integration testing to diagnose and correct.
