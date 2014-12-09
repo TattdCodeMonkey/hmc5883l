@@ -33,6 +33,10 @@ defmodule HMC5883L.HeadingServer do
     {:noreply, current_state}
   end
 
+  def terminate(reason, state) do
+    #TODO: Do something here?
+    :ok
+  end
   #####
   # private method
   defp _init(), do: %{heading: 0.0, state: :unknown}
