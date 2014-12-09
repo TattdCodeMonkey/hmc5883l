@@ -1,4 +1,4 @@
-defmodule HMC5884L.Server do
+defmodule HMC5883L.Server do
   use GenServer
 
   @read_interval 5000
@@ -14,20 +14,20 @@ defmodule HMC5884L.Server do
   #####
   # GenServer implementation
   def init([hdgSrv, i2cMod, config]) do
-    {:ok , %{heading_srv: hdgSrv, i2c: i2cMod, config: config}}
+    {:ok , %{heading_srv: hdgSrv, i2c: i2cMod, config: config},0}
   end
 
-  def handle_cast({:initialize}, state) do
+  def handle_cast(:initialize, state) do
     state = initialize(state)
     {:noreply, state}
   end
 
-  def handle_cast({:calibrate}, state) do
+  def handle_cast(:calibrate, state) do
     state = calibrate(state)
     {:noreply, state}
   end
 
-  def handle_cast({:read_heading}, state) do
+  def handle_cast(:read_heading, state) do
     state = read_heading(state)
     {:noreply, state}
   end
@@ -79,11 +79,11 @@ defmodule HMC5884L.Server do
   end
   
   defp write_config(state) do
-    state.i2c.write(state.i2c_pid,0x00, HMC5883L.InterfaceControl.encode_config(state.config))
+    state.i2c.write(state.i2c_pid,<<0x00>>, HMC5883L.InterfaceControl.encode_config(state.config))
   end 
 
   defp write_mode(state, value) do
-    state.i2c.write(state.i2c_pid, 0x02, HMC5883L.InterfaceControl.encode_modereg(value))
+    state.i2c.write(state.i2c_pid, <<0x02>>, HMC5883L.InterfaceControl.encode_modereg(value))
 
     config = state.config
     config = %{config| mode: value}
@@ -93,7 +93,7 @@ defmodule HMC5884L.Server do
   end
 
   defp write_gain(state, gain) do
-    state.i2c.write(state.i2c_pid, 0x01, HMC5883L.InterfaceControl.encode_cfgb(gain))
+    state.i2c.write(state.i2c_pid, <<0x01>>, HMC5883L.InterfaceControl.encode_cfgb(gain))
     config = state.config
     config = %{config| gain: gain}
     #TODO: update config to be saved somewhere??
@@ -102,7 +102,7 @@ defmodule HMC5884L.Server do
   end
 
   defp read_heading_from_i2c(state) do
-    state.i2c.write(state.i2c_pid,0x03)
+    state.i2c.write(state.i2c_pid,<<0x03>>)
     :timer.sleep(1)
     state.i2c.read(state.i2c_pid, 6)
     |> HMC5883L.InterfaceControl.decodeHeading(state.config.gain)     
