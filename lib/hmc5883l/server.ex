@@ -1,5 +1,6 @@
 defmodule HMC5883L.Server do
   use GenServer
+  alias I2c
 
   @read_interval 5000
 
@@ -79,16 +80,10 @@ defmodule HMC5883L.Server do
   end
 
   defp write_config(state) do
-<<<<<<< HEAD
-    state.i2c.write(state.i2c_pid,0x00, HMC5883L.InterfaceControl.encode_config(state.config))
+    state.i2c.write(state.i2c_pid,<<0x00>> <> HMC5883L.InterfaceControl.encode_config(state.config))
   end
-=======
-    state.i2c.write(state.i2c_pid,<<0x00>>, HMC5883L.InterfaceControl.encode_config(state.config))
-  end
->>>>>>> a74a1cb175ec381ab310f0caafa1d586de4a8bee
-
   defp write_mode(state, value) do
-    state.i2c.write(state.i2c_pid, <<0x02>>, HMC5883L.InterfaceControl.encode_modereg(value))
+    state.i2c.write(state.i2c_pid, <<0x02>> <> HMC5883L.InterfaceControl.encode_modereg(value))
 
     config = state.config
     config = %{config| mode: value}
@@ -98,7 +93,7 @@ defmodule HMC5883L.Server do
   end
 
   defp write_gain(state, gain) do
-    state.i2c.write(state.i2c_pid, <<0x01>>, HMC5883L.InterfaceControl.encode_cfgb(gain))
+    state.i2c.write(state.i2c_pid, <<0x01>> <> HMC5883L.InterfaceControl.encode_cfgb(gain))
     config = state.config
     config = %{config| gain: gain}
     #TODO: update config to be saved somewhere??
