@@ -19,9 +19,9 @@ defmodule HMC5883L.HeadingServer do
   #####
   # GenServer Implementation
 
-  def handle_call(:get_value, _from, current_state), do: {:reply, current_state.heading, current_state }
+  def handle_call({:get_value}, _from, current_state), do: {:reply, current_state.heading, current_state }
 
-  def handle_call(:get_state, _, current_state), do: {:reply, current_state.state, current_state}
+  def handle_call({:get_state}, _, current_state), do: {:reply, current_state.state, current_state}
 
   def handle_cast({:update_value, value}, current_state) do
     current_state = %{current_state| heading: value}
