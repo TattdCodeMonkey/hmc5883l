@@ -1,2 +1,2 @@
-defmodule Hmc5883l do
+defmodule HMC5883L do
 end
