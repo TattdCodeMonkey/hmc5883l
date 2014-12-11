@@ -1,6 +1,6 @@
 defmodule HMC5883L.InterfaceControl do
   import HMC5883L.Utilities
-  
+
   @avg_bit_len    2
   @drate_bit_len  3
   @bias_bit_len   2
@@ -9,7 +9,7 @@ defmodule HMC5883L.InterfaceControl do
   @high_spd_i2c   1
 
   @cfga_spare_bit_len 1
-  @cfgb_spare_bit_len 5 
+  @cfgb_spare_bit_len 5
   @mdrg_spare_bit_len 5
 
   def decode_config(<<cfga,cfgb,modeReg>>) do
@@ -27,7 +27,7 @@ defmodule HMC5883L.InterfaceControl do
     cfga <> cfgb <> modereg
   end
 
-  ######### 
+  #########
   ###  Config Register A
   ##########
   def default_cfga(), do: encode_cfga(8,15,:normal)
@@ -48,7 +48,7 @@ defmodule HMC5883L.InterfaceControl do
 
     %{averaging: averaging, data_rate: dataRate, bias: bias}
   end
-  ######### 
+  #########
   ###  Config Register B
   ##########
   def default_cfgb(), do: encode_cfgb(1.3)
@@ -58,15 +58,15 @@ defmodule HMC5883L.InterfaceControl do
     bsSpare = <<0::size(@cfgb_spare_bit_len)>>
     <<bsGain::bitstring, bsSpare::bitstring>>
   end
-  
+
   def decode_cfgb(cfgb) do
     <<bsGain::size(@gain_bit_len), bsSpare::size(@cfgb_spare_bit_len)>> = cfgb
     %{gain: dec_gain(bsGain)}
   end
 
-  ######### 
-  ###  Mode Register 
-  ########## 
+  #########
+  ###  Mode Register
+  ##########
   def default_modereg(), do: encode_modereg(:continuous)
   def encode_modereg(%{mode: mode}), do: encode_modereg(mode)
   def encode_modereg(mode) do
@@ -81,17 +81,17 @@ defmodule HMC5883L.InterfaceControl do
     %{mode: dec_mode(bsMode)}
   end
 
-  ######### 
+  #########
   ###  Heading decode
-  ########## 
+  ##########
   def decodeHeading(<<x_raw :: size(16), z_raw :: size(16), y_raw :: size(16)>>, gain) do
-    x_out = x_raw * gain
-    y_out = y_raw * gain
-    z_out = z_raw * gain
+    x_out = x_raw / gain
+    y_out = y_raw / gain
+    z_out = z_raw / gain
 
     :math.atan2(y_out,x_out)
-    |> bearingToDegrees   
-  end 
+    |> bearingToDegrees
+  end
 
   defp bearingToDegrees(rad_ber) when rad_ber < 0 do
     rad_ber + (2 * :math.pi)
