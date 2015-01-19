@@ -13,13 +13,27 @@ Current design is
 	    |
 	   / \
 	  /    \
-	Heading Server (holds latest valid heading read)
+	Heading Server 
     		   \
 		        Compass Supervisor
     		    |
-		        Compass Server (Handle all interaction with compass over i2c)
+		        Server 
 
 
-Further unit tests are needed.
-All code is functioning, but readings from compass do not seem correct.
-Will require further integration testing to diagnose and correct issues.
+- **HMC5883L.Supervisor:** Starts and supervises heading server and compass supervisor
+- **HMC5883L.CompassSupervisor:** Starts and supervises HMC5883L.Server
+- **HMC5883L.Server:** 
+	- Interacts with compass. 
+	- Reads heading @ 5hz. (set with @read_interval) 
+	- Sends updates to HMC5883L.HeadingServer
+- **HMC5883L.HeadingServer:**
+	- get_value(pid) - returns the most recent magnetic heading reading in decimal degrees	 	
+	- get_state(pid)
+		1. :unknown 	 - default
+		2. :initialized  - HMC5883L.Server has been initialized
+		3. :calibrated	- HMC5883L.Server has been calibrated *Not implemented*
+
+####TODO:
+- Add additional unit tests
+- Load config from env variables
+- Handle updating configuration at runtime, changing mode gain etc.
