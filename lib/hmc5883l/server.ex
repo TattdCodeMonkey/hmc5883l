@@ -3,7 +3,7 @@ defmodule HMC5883L.Server do
   alias HMC5883L.HeadingServer, as: HeadingServer
   alias I2c
 
-  @read_interval 1000
+  @read_interval 200
 
   #####
   # External API
