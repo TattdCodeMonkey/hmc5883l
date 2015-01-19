@@ -33,7 +33,7 @@ defmodule HMC5883L.HeadingServer do
     {:noreply, current_state}
   end
 
-  def terminate(reason, state) do
+  def terminate(_reason, _state) do
     #TODO: Do something here?
     :ok
   end

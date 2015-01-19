@@ -63,7 +63,7 @@ defmodule HMC5883L.InterfaceControl do
   end
 
   def decode_cfgb(cfgb) do
-    <<bsGain::size(@gain_bit_len), bsSpare::size(@cfgb_spare_bit_len)>> = cfgb
+    <<bsGain::size(@gain_bit_len), _::size(@cfgb_spare_bit_len)>> = cfgb
     %{gain: dec_gain(bsGain)}
   end
 
@@ -90,7 +90,7 @@ defmodule HMC5883L.InterfaceControl do
   def decodeHeading(<<x_raw :: size(16)-signed, z_raw :: size(16)-signed, y_raw :: size(16)-signed>>, gain) do
     x_out = x_raw * gain
     y_out = y_raw * gain
-    z_out = z_raw * gain
+#   z_out = z_raw * gain
 
     :math.atan2(y_out,x_out)
     |> bearingToDegrees

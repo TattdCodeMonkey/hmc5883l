@@ -47,7 +47,7 @@ defmodule HMC5883L.Server do
     {:ok, state}
   end
 
-  def terminate(reason, state) do
+  def terminate(_reason, _state) do
     #TODO: Do something here?
     :ok
   end
