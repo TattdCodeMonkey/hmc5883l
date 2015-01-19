@@ -4,7 +4,7 @@ defmodule HMC5883L.HeadingServer do
   #####
   # External API
 
-  def start_link(), do: {:ok, _pid} = GenServer.start_link(__MODULE__, _init())
+  def start_link(), do: {:ok, _pid} = GenServer.start_link(__MODULE__, _init(), name: __MODULE__)
 
   def update_state(pid, state), do: GenServer.cast(pid, {:update_state, state})
 
