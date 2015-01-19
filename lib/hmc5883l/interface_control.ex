@@ -1,6 +1,9 @@
 defmodule HMC5883L.InterfaceControl do
   import HMC5883L.Utilities
 
+  @one_radian 6.283185307179586
+  @rad_to_degrees 57.29577951308232
+
   @avg_bit_len    2
   @drate_bit_len  3
   @bias_bit_len   2
@@ -94,10 +97,14 @@ defmodule HMC5883L.InterfaceControl do
   end
 
   defp bearingToDegrees(rad_ber) when rad_ber < 0 do
-    rad_ber + (2 * :math.pi)
+    rad_ber + @one_radian 
     |> bearingToDegrees
   end
-  defp bearingToDegrees(rad_ber) do
-    rad_ber * (180 / :math.pi)
+  defp bearingToDegrees(rad_ber) when rad_ber > @one_radian do
+    rad_ber - @one_radian 
+    |> bearingToDegrees
+  end
+   defp bearingToDegrees(rad_ber) do
+    rad_ber * @rad_to_degrees 
   end
 end
