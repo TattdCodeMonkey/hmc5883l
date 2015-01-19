@@ -1,6 +1,5 @@
 defmodule HMC5883L.Server do
   use GenServer
-  alias __MODULE__
   alias HMC5883L.HeadingServer, as: HeadingServer
   alias I2c
 

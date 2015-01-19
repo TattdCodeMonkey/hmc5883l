@@ -87,7 +87,7 @@ defmodule HMC5883L.InterfaceControl do
   #########
   ###  Heading decode
   ##########
-  def decodeHeading(<<x_raw :: size(16)-signed, z_raw :: size(16)-signed, y_raw :: size(16)-signed>>, gain) do
+  def decodeHeading(<<x_raw :: size(16)-signed, _z_raw :: size(16)-signed, y_raw :: size(16)-signed>>, gain) do
     x_out = x_raw * gain
     y_out = y_raw * gain
 #   z_out = z_raw * gain
