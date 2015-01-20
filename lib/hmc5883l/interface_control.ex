@@ -87,24 +87,24 @@ defmodule HMC5883L.InterfaceControl do
   #########
   ###  Heading decode
   ##########
-  def decodeHeading(<<x_raw :: size(16)-signed, _z_raw :: size(16)-signed, y_raw :: size(16)-signed>>, gain) do
-    x_out = x_raw * gain
-    y_out = y_raw * gain
-#   z_out = z_raw * gain
+  def decode_heading(<<x_raw :: size(16)-signed, _z_raw :: size(16)-signed, y_raw :: size(16)-signed>>, scale) do
+    x_out = x_raw * scale
+    y_out = y_raw * scale
+#   z_out = z_raw * scale
 
     :math.atan2(y_out,x_out)
-    |> bearingToDegrees
+    |> bearing_to_degrees
   end
 
-  defp bearingToDegrees(rad_ber) when rad_ber < 0 do
+  defp bearing_to_degrees(rad_ber) when rad_ber < 0 do
     rad_ber + @one_radian 
-    |> bearingToDegrees
+    |> bearing_to_degrees
   end
-  defp bearingToDegrees(rad_ber) when rad_ber > @one_radian do
+  defp bearing_to_degrees(rad_ber) when rad_ber > @one_radian do
     rad_ber - @one_radian 
-    |> bearingToDegrees
+    |> bearing_to_degrees
   end
-   defp bearingToDegrees(rad_ber) do
+   defp bearing_to_degrees(rad_ber) do
     rad_ber * @rad_to_degrees 
   end
 end

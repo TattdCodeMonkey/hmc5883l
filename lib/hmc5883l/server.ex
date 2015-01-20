@@ -1,6 +1,8 @@
 defmodule HMC5883L.Server do
   use GenServer
-  alias HMC5883L.HeadingServer, as: HeadingServer
+  alias HMC5883L.HeadingServer
+  alias HMC5883L.Utilities
+  alias HMC5883L.InterfaceControl
   alias I2c
 
   @read_interval 200
@@ -81,10 +83,10 @@ defmodule HMC5883L.Server do
   end
 
   defp write_config(state) do
-    state.i2c.write(state.i2c_pid,<<0x00>> <> HMC5883L.InterfaceControl.encode_config(state.config))
+    state.i2c.write(state.i2c_pid,<<0x00>> <> InterfaceControl.encode_config(state.config))
   end
   defp write_mode(state, value) do
-    state.i2c.write(state.i2c_pid, <<0x02>> <> HMC5883L.InterfaceControl.encode_modereg(value))
+    state.i2c.write(state.i2c_pid, <<0x02>> <> InterfaceControl.encode_modereg(value))
 
     config = state.config
     config = %{config| mode: value}
@@ -94,9 +96,9 @@ defmodule HMC5883L.Server do
   end
 
   defp write_gain(state, gain) do
-    state.i2c.write(state.i2c_pid, <<0x01>> <> HMC5883L.InterfaceControl.encode_cfgb(gain))
+    state.i2c.write(state.i2c_pid, <<0x01>> <> InterfaceControl.encode_cfgb(gain))
     config = state.config
-    config = %{config| gain: gain}
+    config = %{config| gain: gain, scale: Utilities.get_scale(gain)}
     #TODO: update config to be saved somewhere??
     state  = %{state| config: config}
     state
@@ -106,7 +108,7 @@ defmodule HMC5883L.Server do
     state.i2c.write(state.i2c_pid,<<0x03>>)
     :timer.sleep(1)
     state.i2c.read(state.i2c_pid, 6)
-    |> HMC5883L.InterfaceControl.decodeHeading(state.config.gain)
+    |> InterfaceControl.decode_heading(state.config.gain)
   end
 
   ## Send data to HeadingServer
