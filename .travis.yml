@@ -4,8 +4,6 @@ notifications:
     - rodney@tattdcodemonkey.com
 otp_release:
   - 17.0
-  - 17.1
-  - 17.4
 env:
   - ELIXIR="v1.0.2"
 install: mix deps.get
