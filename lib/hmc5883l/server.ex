@@ -105,10 +105,13 @@ defmodule HMC5883L.Server do
   end
 
   defp read_heading_from_i2c(state) do
+    #write 0x03 to prep reading from heading registers
     state.i2c.write(state.i2c_pid,<<0x03>>)
+    #sleep 1 ms to allow write above to process
     :timer.sleep(1)
+    #read raw value registers (3-8), then decode them to a decimal degrees value
     state.i2c.read(state.i2c_pid, 6)
-    |> InterfaceControl.decode_heading(state.config.gain)
+    |> InterfaceControl.decode_heading(state.config.scale)
   end
 
   ## Send data to HeadingServer
