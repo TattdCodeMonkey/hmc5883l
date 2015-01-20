@@ -1,5 +1,6 @@
 HMC5883L
 ========
+[![Build Status](https://travis-ci.org/TattdCodeMonkey/hmc5883l.png?branch=master)](https://travis-ci.org/TattdCodeMonkey/hmc5883l)
 
 This is a module for reading the HMC5883L magnetic compass. It utilizes elixir_ale for configuring and reading the compass over i2c.
 
