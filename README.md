@@ -30,10 +30,11 @@ Current design is
 - **HMC5883L.HeadingServer:**
 	- get_value(pid) - returns the most recent magnetic heading reading in decimal degrees	 	
 	- get_state(pid)
-		1. :unknown 	 - default
+		1. :unknown 	 - initial setting
 		2. :initialized  - HMC5883L.Server has been initialized
-		3. :calibrated	- HMC5883L.Server has been calibrated *Not implemented*
-
+		3. :calibrated	- HMC5883L.Server has been *Not implemented*
+		4. :error		- Set when HMC5883L.Server process terminates
+	
 ####TODO:
 - Add additional unit tests
 - Load config from env variables
