@@ -3,15 +3,35 @@ defmodule HMC5883L.HeadingServer do
 
   #####
   # External API
-
   def start_link(), do: {:ok, _pid} = GenServer.start_link(__MODULE__, _init(), name: __MODULE__)
 
+  @doc """
+    Updates the current state, should only be called by Compass server.
+  """
+  @spec update_state(pid, atom) :: Tuple
   def update_state(pid, state), do: GenServer.cast(pid, {:update_state, state})
 
+  @doc """
+    Updates the current heading value, should only be called by the Compass server.
+  """
+  @spec update_value(pid, number) :: Tuple
   def update_value(pid, value), do: GenServer.cast(pid, {:update_value, value})
 
+  @doc """
+    Returns the current heading value in decimal degrees.
+  """
+  @spec get_value(pid) :: float
   def get_value(pid), do: GenServer.call(pid, {:get_value})
 
+  @doc """
+    Returns the current state of the driver.
+
+    :unknown     - initial state
+    :initialized - Compass is configured and reading
+    :calibrated  - Compass offsets have been calibrated
+    :error       - Compass server terminated, and has not successfully restarted
+  """
+  @spec get_state(pid) :: atom
   def get_state(pid), do: GenServer.call(pid, {:get_state})
 
   #compass lost?

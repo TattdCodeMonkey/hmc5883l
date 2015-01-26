@@ -22,7 +22,7 @@ defmodule HMC5883L.Server do
   end
 
   def handle_cast(:initialize, state) do
-    state = initialize(state)
+    state = initialize!(state)
     {:noreply, state}
   end
 
@@ -48,18 +48,19 @@ defmodule HMC5883L.Server do
     {:ok, state}
   end
 
-  def terminate(_reason, _state) do
+  def terminate(_reason, state) do
+    terminated(state);
     #TODO: Do something here?
     :ok
   end
   #####
   # private methods
-  defp initialize(state) do
+  defp initialize!(state) do
     #start link to i2c
     {:ok, i2cPid} = state.i2c.start_link(state.config.i2c_channel,state.config.i2c_devid)
     state = %{state| i2c_pid: i2cPid}
     #write config. TODO: Change these for configured values
-    write_config(state)
+    write_config state
     #read heading
     state = read_heading(state)
     #set timer for reading header
@@ -126,4 +127,6 @@ defmodule HMC5883L.Server do
   defp calibrated(state) do
     HeadingServer.update_state(state.heading_srv, :calibrated)
   end
+
+  defp terminated(state), do: HeadingServer.update_state(state.heading_srv, :error)
 end
