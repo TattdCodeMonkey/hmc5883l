@@ -49,7 +49,8 @@ defmodule HMC5883L.Server do
   end
 
   def terminate(_reason, state) do
-    terminated(state);
+    terminated(state)
+    release_i2c(state)
     #TODO: Do something here?
     :ok
   end
@@ -115,6 +116,12 @@ defmodule HMC5883L.Server do
     |> InterfaceControl.decode_heading(state.config.scale)
   end
 
+  defp release_i2c(%{i2c_pid: nil} = state), do: state
+  defp release_i2c(state) do
+    state.i2c.release(state.i2c_pid)
+    state = %{state | i2c_pid: nil}
+    state
+  end
   ## Send data to HeadingServer
   defp update_heading(state) do
     HeadingServer.update_value(state.heading_srv, state.heading)
