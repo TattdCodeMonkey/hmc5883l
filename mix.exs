@@ -3,14 +3,12 @@ defmodule Hmc5883l.Mixfile do
 
   def project do
     [app: :hmc5883l,
-     version: "0.0.1",
+     version: "0.1.0",
      elixir: "~> 1.0",
-     deps: deps]
+     deps: deps,
+     package: package()]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type `mix help compile.app` for more information
   def application do
     [
       applications: [:logger],
@@ -18,19 +16,18 @@ defmodule Hmc5883l.Mixfile do
     ]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type `mix help deps` for more examples and options
   defp deps do
     [
       {:multidef, "~>0.2"},
+      {:dialyze, "~> 0.1.3", optional: true},
       {:elixir_ale, "~>0.2"}
     ]
+  end
+
+  defp package() do
+    [files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      contributors: ["Rodney Norris"],
+      licenses: ["Apache 2.0"],
+      links: [{"Github", "https://github.com/tattdcodemonkey/hmc5883l"}]]
   end
 end
