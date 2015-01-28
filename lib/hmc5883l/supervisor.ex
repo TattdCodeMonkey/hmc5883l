@@ -3,6 +3,7 @@ defmodule HMC5883L.Supervisor do
   """
   use Supervisor
 
+  @spec start_link() :: {atom, pid}
   def start_link() do
     result = {:ok, sup} = Supervisor.start_link(__MODULE__,[])
     start_workers(sup, [])

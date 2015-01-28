@@ -15,7 +15,7 @@ defmodule HMC5883L.InterfaceControl do
   @cfgb_spare_bit_len 5
   @mdrg_spare_bit_len 5
 
-  @spec decode_config(<<_::24>>) :: Map
+  @spec decode_config(<<_::24>>) :: %{}
   def decode_config(<<cfga,cfgb,modeReg>>) do
     regA    = <<cfga>>    |> decode_cfga
     regB    = <<cfgb>>    |> decode_cfgb
@@ -23,7 +23,7 @@ defmodule HMC5883L.InterfaceControl do
     regA |> Map.merge regB |> Map.merge regMode
   end
 
-  @spec encode_config(Map) :: <<_::24>>
+  @spec encode_config(%{}) :: <<_::24>>
   def encode_config(config) do
     cfga = config |> encode_cfga
     cfgb = config |> encode_cfgb
@@ -37,8 +37,9 @@ defmodule HMC5883L.InterfaceControl do
   ##########
   @spec default_cfga() :: <<_::8>>
   def default_cfga(), do: encode_cfga(8,15,:normal)
-  @spec encode_cfga(Map) :: <<_::8>>
+  @spec encode_cfga(%{}) :: <<_::8>>
   def encode_cfga(%{averaging: avg, data_rate: rate, bias: bias}), do: encode_cfga(avg, rate, bias)
+  @spec encode_cfga(number, number, atom) :: <<_::8>>
   def encode_cfga(avg, rate, bias) do
     bsAvg   = <<enc_samplingavg(avg)::size(@avg_bit_len)>>
     bsDR    = <<enc_datarate(rate)::size(@drate_bit_len)>>
@@ -47,7 +48,7 @@ defmodule HMC5883L.InterfaceControl do
     <<bsSpare::bitstring, bsAvg::bitstring, bsDR::bitstring, bsBias::bitstring>>
   end
 
-  @spec decode_cfga(<<_::8>>) :: Map
+  @spec decode_cfga(<<_::8>>) :: %{}
   def decode_cfga(cfga) do
     <<_::size(@cfga_spare_bit_len), bsAvg::size(@avg_bit_len), bsDataRate::size(@drate_bit_len), bsBias::size(@bias_bit_len)>> = cfga
     averaging = dec_samplingavg(bsAvg)
@@ -62,15 +63,17 @@ defmodule HMC5883L.InterfaceControl do
   @spec default_cfgb() :: <<_::8>>
   def default_cfgb(), do: encode_cfgb(1.3)
 
-  @spec encode_cfgb(Map) :: <<_::8>>
+  @spec encode_cfgb(%{}) :: <<_::8>>
   def encode_cfgb(%{gain: gain}), do: encode_cfgb(gain)
+  
+  @spec encode_cfgb(number) :: <<_::8>>
   def encode_cfgb(gain) do
     bsGain  = <<enc_gain(gain)::size(@gain_bit_len)>>
     bsSpare = <<0::size(@cfgb_spare_bit_len)>>
     <<bsGain::bitstring, bsSpare::bitstring>>
   end
 
-  @spec decode_cfgb(<<_::8>>) :: Map
+  @spec decode_cfgb(<<_::8>>) :: %{}
   def decode_cfgb(cfgb) do
     <<bsGain::size(@gain_bit_len), _::size(@cfgb_spare_bit_len)>> = cfgb
     %{gain: dec_gain(bsGain)}
@@ -81,8 +84,11 @@ defmodule HMC5883L.InterfaceControl do
   ##########
   @spec default_modereg() :: <<_::8>>
   def default_modereg(), do: encode_modereg(:continuous)
-  @spec encode_modereg(Map) :: <<_::8>>
+  
+  @spec encode_modereg(%{}) :: <<_::8>>
   def encode_modereg(%{mode: mode}), do: encode_modereg(mode)
+  
+  @spec encode_modereg(atom) :: <<_::8>>
   def encode_modereg(mode) do
     bsHighSpeedI2c = <<0::size(@high_spd_i2c)>> #always zero for now
     bsMode  = <<enc_mode(mode)::size(@mode_bit_len)>>
@@ -90,7 +96,7 @@ defmodule HMC5883L.InterfaceControl do
     <<bsHighSpeedI2c::bitstring, bsSpare::bitstring, bsMode::bitstring>>
   end
 
-  @spec decode_modereg(<<_::8>>) :: Map
+  @spec decode_modereg(<<_::8>>) :: %{}
   def decode_modereg(modeReg) do
     <<_::size(@high_spd_i2c), _::size(@mdrg_spare_bit_len), bsMode::size(@mode_bit_len)>> = modeReg
     %{mode: dec_mode(bsMode)}

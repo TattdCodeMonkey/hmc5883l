@@ -32,12 +32,12 @@ defmodule HMC5883L.Server do
   end
 
   def handle_cast(:read_heading, state) do
-    state = read_heading(state)
+    state = read_heading!(state)
     {:noreply, state}
   end
 
   def handle_info(:timed_read, state) do
-    state = read_heading(state)
+    state = read_heading!(state)
     time_read()
     {:noreply, state}
   end
@@ -61,9 +61,9 @@ defmodule HMC5883L.Server do
     {:ok, i2cPid} = state.i2c.start_link(state.config.i2c_channel,state.config.i2c_devid)
     state = %{state| i2c_pid: i2cPid}
     #write config. TODO: Change these for configured values
-    write_config state
+    :ok = write_config! state
     #read heading
-    state = read_heading(state)
+    state = read_heading!(state)
     #set timer for reading header
     time_read()
     initialized(state)
@@ -72,8 +72,8 @@ defmodule HMC5883L.Server do
 
   defp time_read(), do: Process.send_after(self(),:timed_read, @read_interval)
 
-  defp read_heading(state) do
-    bearingDegrees = read_heading_from_i2c(state)
+  defp read_heading!(state) do
+    bearingDegrees = read_heading_from_i2c!(state)
     state = %{state| heading: bearingDegrees}
     update_heading(state)
     state
@@ -84,10 +84,11 @@ defmodule HMC5883L.Server do
     state
   end
 
-  defp write_config(state) do
+  defp write_config!(state) do
     state.i2c.write(state.i2c_pid,<<0x00>> <> InterfaceControl.encode_config(state.config))
   end
-  defp write_mode(state, value) do
+
+  defp write_mode!(state, value) do
     state.i2c.write(state.i2c_pid, <<0x02>> <> InterfaceControl.encode_modereg(value))
 
     config = state.config
@@ -97,7 +98,7 @@ defmodule HMC5883L.Server do
     state
   end
 
-  defp write_gain(state, gain) do
+  defp write_gain!(state, gain) do
     state.i2c.write(state.i2c_pid, <<0x01>> <> InterfaceControl.encode_cfgb(gain))
     config = state.config
     config = %{config| gain: gain, scale: Utilities.get_scale(gain)}
@@ -106,9 +107,9 @@ defmodule HMC5883L.Server do
     state
   end
 
-  defp read_heading_from_i2c(state) do
+  defp read_heading_from_i2c!(state) do
     #write 0x03 to prep reading from heading registers
-    state.i2c.write(state.i2c_pid,<<0x03>>)
+    :ok = state.i2c.write(state.i2c_pid,<<0x03>>)
     #sleep 1 ms to allow write above to process
     :timer.sleep(1)
     #read raw value registers (3-8), then decode them to a decimal degrees value
