@@ -12,6 +12,7 @@ defmodule Hmc5883l.Mixfile do
   def application do
     [
       applications: [:logger],
+      env: [board: :pi, i2c: [], compass: []],
       registered: [:hmc5883l]
     ]
   end
@@ -19,8 +20,8 @@ defmodule Hmc5883l.Mixfile do
   defp deps do
     [
       {:multidef, "~>0.2"},
-      {:dialyze, "~> 0.1.3", optional: true},
-      {:elixir_ale, "~>0.2"}
+      {:dialyze, "~> 0.1.3", optional: true}
+#     {:elixir_ale, "~>0.2"}
     ]
   end
 
