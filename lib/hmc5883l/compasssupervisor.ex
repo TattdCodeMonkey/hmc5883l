@@ -12,8 +12,8 @@ defmodule HMC5883L.CompassSupervisor do
 
   def init(hdgSrv) do
     #state.config.i2c_channel,state.config.i2c_devid
-    i2cConfig = HMC5883L.Configuration.new #use default config everytime, until stash server is implemented and config can be loaded from a previous state
-    child_processes = [ worker(HMC5883L.Server, [[hdgSrv, I2c, i2cConfig]]) ]
+    serverConfig = HMC5883L.Configuration.load_from_env()    
+    child_processes = [ worker(HMC5883L.Server, [[hdgSrv, I2c, serverConfig]])]
     supervise child_processes, strategy: :one_for_one
   end
 end
