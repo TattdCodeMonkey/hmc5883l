@@ -37,6 +37,5 @@ Current design is
 	
 ####TODO:
 - Add additional unit tests
-- Load config from env variables
 - Handle updating configuration at runtime, changing mode gain etc.
 - Implement calibration
