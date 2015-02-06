@@ -16,20 +16,20 @@ defmodule HMC5883L.InterfaceControl do
   @mdrg_spare_bit_len 5
 
   @spec decode_config(<<_::24>>) :: %{}
-  def decode_config(<<cfga,cfgb,modeReg>>) do
-    regA    = <<cfga>>    |> decode_cfga
-    regB    = <<cfgb>>    |> decode_cfgb
-    regMode = <<modeReg>> |> decode_modereg
-    regA |> Map.merge regB |> Map.merge regMode
+  def decode_config(<<cfg_a,cfg_b,mode_reg>>) do
+    reg_a    = <<cfg_a>>    |> decode_cfga
+    reg_b    = <<cfg_b>>    |> decode_cfgb
+    reg_mode = <<mode_reg>> |> decode_modereg
+    reg_a |> Map.merge reg_b |> Map.merge reg_mode
   end
 
   @spec encode_config(%{}) :: <<_::24>>
   def encode_config(config) do
-    cfga = config |> encode_cfga
-    cfgb = config |> encode_cfgb
-    modereg = config |> encode_modereg
+    cfg_a = config |> encode_cfga
+    cfg_b = config |> encode_cfgb
+    mode_reg = config |> encode_modereg
 
-    cfga <> cfgb <> modereg
+    cfg_a <> cfg_b <> mode_reg
   end
 
   #########
@@ -41,21 +41,21 @@ defmodule HMC5883L.InterfaceControl do
   def encode_cfga(%{averaging: avg, data_rate: rate, bias: bias}), do: encode_cfga(avg, rate, bias)
   @spec encode_cfga(number, number, atom) :: <<_::8>>
   def encode_cfga(avg, rate, bias) do
-    bsAvg   = <<enc_samplingavg(avg)::size(@avg_bit_len)>>
-    bsDR    = <<enc_datarate(rate)::size(@drate_bit_len)>>
-    bsBias  = <<enc_bias(bias)::size(@bias_bit_len)>>
-    bsSpare = <<0::size(@cfga_spare_bit_len)>>
-    <<bsSpare::bitstring, bsAvg::bitstring, bsDR::bitstring, bsBias::bitstring>>
+    bs_avg   = <<enc_samplingavg(avg)::size(@avg_bit_len)>>
+    bs_dr    = <<enc_datarate(rate)::size(@drate_bit_len)>>
+    bs_bias  = <<enc_bias(bias)::size(@bias_bit_len)>>
+    bs_spare = <<0::size(@cfga_spare_bit_len)>>
+    <<bs_spare::bitstring, bs_avg::bitstring, bs_dr::bitstring, bs_bias::bitstring>>
   end
 
   @spec decode_cfga(<<_::8>>) :: %{}
-  def decode_cfga(cfga) do
-    <<_::size(@cfga_spare_bit_len), bsAvg::size(@avg_bit_len), bsDataRate::size(@drate_bit_len), bsBias::size(@bias_bit_len)>> = cfga
-    averaging = dec_samplingavg(bsAvg)
-    dataRate  = dec_datarate(bsDataRate)
-    bias      = dec_bias(bsBias)
+  def decode_cfga(cfg_a) do
+    <<_::size(@cfga_spare_bit_len), bs_avg::size(@avg_bit_len), bs_data_rate::size(@drate_bit_len), bs_bias::size(@bias_bit_len)>> = cfg_a
+    averaging = dec_samplingavg(bs_avg)
+    data_rate = dec_datarate(bs_data_rate)
+    bias      = dec_bias(bs_bias)
 
-    %{averaging: averaging, data_rate: dataRate, bias: bias}
+    %{averaging: averaging, data_rate: data_rate, bias: bias}
   end
   #########
   ###  Config Register B
@@ -68,15 +68,15 @@ defmodule HMC5883L.InterfaceControl do
   
   @spec encode_cfgb(number) :: <<_::8>>
   def encode_cfgb(gain) do
-    bsGain  = <<enc_gain(gain)::size(@gain_bit_len)>>
-    bsSpare = <<0::size(@cfgb_spare_bit_len)>>
-    <<bsGain::bitstring, bsSpare::bitstring>>
+    bs_gain  = <<enc_gain(gain)::size(@gain_bit_len)>>
+    bs_spare = <<0::size(@cfgb_spare_bit_len)>>
+    <<bs_gain::bitstring, bs_spare::bitstring>>
   end
 
   @spec decode_cfgb(<<_::8>>) :: %{}
-  def decode_cfgb(cfgb) do
-    <<bsGain::size(@gain_bit_len), _::size(@cfgb_spare_bit_len)>> = cfgb
-    %{gain: dec_gain(bsGain)}
+  def decode_cfgb(cfg_b) do
+    <<bs_gain::size(@gain_bit_len), _::size(@cfgb_spare_bit_len)>> = cfg_b
+    %{gain: dec_gain(bs_gain)}
   end
 
   #########
@@ -90,16 +90,16 @@ defmodule HMC5883L.InterfaceControl do
   
   @spec encode_modereg(atom) :: <<_::8>>
   def encode_modereg(mode) do
-    bsHighSpeedI2c = <<0::size(@high_spd_i2c)>> #always zero for now
-    bsMode  = <<enc_mode(mode)::size(@mode_bit_len)>>
-    bsSpare = <<0::size(@mdrg_spare_bit_len)>>
-    <<bsHighSpeedI2c::bitstring, bsSpare::bitstring, bsMode::bitstring>>
+    bs_highspeed_i2c = <<0::size(@high_spd_i2c)>> #always zero for now
+    bs_mode  = <<enc_mode(mode)::size(@mode_bit_len)>>
+    bs_spare = <<0::size(@mdrg_spare_bit_len)>>
+    <<bs_highspeed_i2c::bitstring, bs_spare::bitstring, bs_mode::bitstring>>
   end
 
   @spec decode_modereg(<<_::8>>) :: %{}
-  def decode_modereg(modeReg) do
-    <<_::size(@high_spd_i2c), _::size(@mdrg_spare_bit_len), bsMode::size(@mode_bit_len)>> = modeReg
-    %{mode: dec_mode(bsMode)}
+  def decode_modereg(mode_reg) do
+    <<_::size(@high_spd_i2c), _::size(@mdrg_spare_bit_len), bs_mode::size(@mode_bit_len)>> = mode_reg
+    %{mode: dec_mode(bs_mode)}
   end
 
   #########

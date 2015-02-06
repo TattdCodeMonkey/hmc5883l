@@ -137,6 +137,7 @@ defmodule HMC5883L.Utilities do
     <<6::size(3)>> -> dec_datarate(0x06)
   end
   
+  @spec get_scale(number) :: number
   mdef get_scale do
     0.88 -> 0.73
     1.3 -> 0.92

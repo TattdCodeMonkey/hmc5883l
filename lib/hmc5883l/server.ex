@@ -17,8 +17,8 @@ defmodule HMC5883L.Server do
 
   #####
   # GenServer implementation
-  def init([hdgSrv, i2cMod, config]) do
-    {:ok , %{heading_srv: hdgSrv, i2c: i2cMod, config: config, i2c_pid: nil, heading: nil}}
+  def init([hdg_srv, i2c_mod, config]) do
+    {:ok , %{heading_srv: hdg_srv, i2c: i2c_mod, config: config, i2c_pid: nil, heading: nil}}
   end
 
   def handle_cast(:initialize, state) do
@@ -73,8 +73,8 @@ defmodule HMC5883L.Server do
   defp time_read(), do: Process.send_after(self(),:timed_read, @read_interval)
 
   defp read_heading!(state) do
-    bearingDegrees = read_heading_from_i2c!(state)
-    state = %{state| heading: bearingDegrees}
+    bearing_degrees = read_heading_from_i2c!(state)
+    state = %{state| heading: bearing_degrees}
     update_heading(state)
     state
   end

@@ -10,26 +10,29 @@ defmodule HMC5883L.Configuration do
   @doc """
   Load a new %Configuration{} from the current enviroment variables.
   """
+  @spec load_from_env() :: t
   def load_from_env() do
     new
     |> load_compass_config
     |> load_i2c_config
   end
 
+  @spec load_compass_config(t) :: t
   def load_compass_config(config) do
     Application.get_env(:hmc5883l, :compass)
     |> load_config_from_array(config)
     |> set_scale
   end
-
+  @spec load_i2c_config(t) :: t
   def load_i2c_config(config) do
     Application.get_env(:hmc5883l, :i2c)
     |> load_config_from_array config
   end
 
-
+  @spec load_config_from_array(List, t) :: t
   def load_config_from_array(values, config), do: values |> Enum.reduce(config, &load_config_val/2)
 
+  @spec load_config_val({atom, atom | number | string}, t) :: t
   mdef load_config_val do
     {:i2c_channel, chan}, config -> %{config| i2c_channel: chan}
     {:i2c_devid, id}, config     -> %{config| i2c_devid: id}
@@ -40,6 +43,9 @@ defmodule HMC5883L.Configuration do
     {:averaging, avg}, config -> %{config| averaging: avg}
   end
 
- def set_scale(%Configuration{} = config), do: %{config| scale: config.gain |> Utilities.get_scale}
-
+  @spec set_scale(t) :: t
+  def set_scale(%Configuration{} = config) do 
+    scale = Utilities.get_scale(config.gain)
+    %{config| scale: scale}
+  end
 end
