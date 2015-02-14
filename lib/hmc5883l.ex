@@ -1,15 +1,12 @@
 defmodule HMC5883L do
+  use Application
   alias HMC5883L.Supervisor
-  
+
   @doc """
-    Starts the app supervisor and returns the pid of the HeadingServer. 
-    Call HMC5883L.HeadingServer.get_value with the pid to get latest magnetic heading reading in decimal degrees 
+  Starts the application by starting HMC5883L.Supervisor.
   """
-  @spec run!() :: { atom, pid }
-  def run!() do 
-    {:ok,_supPid} = Supervisor.start_link()
-    hsPid = Process.whereis :HMC5883L.HeadingServer
-    {:ok, hsPid}
+  def start(_type, _args) do
+    Supervisor.start_link()
   end
 end
 

@@ -13,7 +13,8 @@ defmodule Hmc5883l.Mixfile do
     [
       applications: [:logger],
       env: [board: :pi, i2c: [], compass: []],
-      registered: [:hmc5883l]
+      registered: [:hmc5883l],
+      mod: {HMC5883L, []}
     ]
   end
 
