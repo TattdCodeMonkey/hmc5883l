@@ -20,7 +20,7 @@ defmodule Hmc5883l.Mixfile do
 
   defp deps do
     [
-      {:elixir_ale, "~>0.2"},
+      {:elixir_ale, "~>0.2", only: :production},
       {:multidef, "~>0.2"},
       {:dialyze, "~> 0.1.3", optional: true},
       {:shouldi, only: :test}
