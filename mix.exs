@@ -3,10 +3,12 @@ defmodule Hmc5883l.Mixfile do
 
   def project do
     [app: :hmc5883l,
-     version: "0.1.0",
+     version: "0.2.0",
      elixir: "~> 1.0",
      deps: deps,
-     package: package()]
+     test_coverage: [tool: ExCoveralls],
+     package: package()
+    ]
   end
 
   def application do
@@ -20,11 +22,11 @@ defmodule Hmc5883l.Mixfile do
 
   defp deps do
     [
-      {:elixir_ale, "~>0.2", only: :production},
+      {:elixir_ale, "~>0.3", only: :production},
       {:multidef, "~>0.2"},
       {:dialyze, "~> 0.1.3", optional: true},
-      {:shouldi, only: :test}
-
+      {:excoveralls, only: [:dev, :test]},
+      {:shouldi, only:  [:dev, :test]}
     ]
   end
 

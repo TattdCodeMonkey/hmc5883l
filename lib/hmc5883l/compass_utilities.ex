@@ -1,13 +1,19 @@
 defmodule HMC5883L.Utilities do
   import MultiDef
 
+  @event_manager HMC5883L.EventManager
+  @i2c_name HMC5883L.I2c
+
+  def event_manager, do: @event_manager
+  def i2c_name, do: @i2c_name
+
   mdef enc_samplingavg do
     1 -> 0x00
     2 -> 0x01
     4 -> 0x02
     8 -> 0x03
-  end  
-  
+  end
+
   mdef dec_samplingavg do
     0x00 -> 1
     0x01 -> 2
@@ -47,7 +53,7 @@ defmodule HMC5883L.Utilities do
     0x05 -> 4.7
     0x06 -> 5.6
     0x07 -> 8.1
-    <<0::size(3)>> -> dec_gain(0) 
+    <<0::size(3)>> -> dec_gain(0)
     <<1::size(3)>> -> dec_gain(1)
     <<2::size(3)>> -> dec_gain(2)
     <<3::size(3)>> -> dec_gain(3)
@@ -136,7 +142,7 @@ defmodule HMC5883L.Utilities do
     <<5::size(3)>> -> dec_datarate(0x05)
     <<6::size(3)>> -> dec_datarate(0x06)
   end
-  
+
   @spec get_scale(number) :: number
   mdef get_scale do
     0.88 -> 0.73
@@ -151,7 +157,7 @@ defmodule HMC5883L.Utilities do
     1090 -> 0.92
     820 -> 1.22
     660 -> 1.52
-    440 -> 2.27 
+    440 -> 2.27
     390 -> 2.56
     330 -> 3.03
     230 -> 4.35
