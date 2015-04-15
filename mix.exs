@@ -24,7 +24,7 @@ defmodule Hmc5883l.Mixfile do
     [
       {:elixir_ale, "~>0.3", only: :production},
       {:multidef, "~>0.2"},
-      {:dialyze, "~> 0.1.3", optional: true},
+      {:dialyze, "~> 0.1.4", optional: true},
       {:excoveralls, only: [:dev, :test]},
       {:shouldi, only:  [:dev, :test]}
     ]

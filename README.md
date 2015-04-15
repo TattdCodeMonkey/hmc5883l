@@ -8,6 +8,11 @@ This is a module for reading the HMC5883L magnetic compass. It utilizes elixir_a
 
 Currently being developed on a Raspberry Pi running raspbian, will be tested on Beagle Bone Black as well
 - **HMC5883L:** OTP Application, supervises HMC5883L.State & HMC5883L.Supervisor. Also exposes public API
+	- start/2: starts application
+	- heading/0
+	- calibrated?/0
+	- available?/0
+	- gain/0
 - **HMC5883L.Supervisor:** Starts and supervises EventHandler and compass supervisor
 - **HMC5883L.CompassSupervisor:** Starts and supervises elixir_ale I2c process and HMC5883L.Driver
 - **HMC5883L.Server:**
@@ -15,11 +20,11 @@ Currently being developed on a Raspberry Pi running raspbian, will be tested on 
 	- Reads heading @ 5hz. (set with @read_interval)
 	- Raises event through HMC5883L.EventManager
 - **HMC5883L.State:**
-	- get: returns entire state object
-	- heading: returns the last decoded magnetic heading in decimal degrees
-	- calibrated?: returns if the compass has been locally calibrated for compensation offsets
-	- config: returns HMC5883L.CompassConfiguration object with current settings
-	- gain: returns the currently configured gain setting
+	- get/0: returns entire state object
+	- heading/0: returns the last decoded magnetic heading in decimal degrees
+	- calibrated?/0: returns if the compass has been locally calibrated for compensation offsets
+	- config/0: returns HMC5883L.CompassConfiguration object with current settings
+	- gain/0: returns the currently configured gain setting
 - **HMC5883L.EventHandler:** Handles events from driver to update HMC5883L.State
 - **HMC5883L.EventManager:**
 	- {:raw_reading, {x,y,z}} - TODO

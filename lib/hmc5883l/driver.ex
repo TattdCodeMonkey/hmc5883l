@@ -76,7 +76,7 @@ defmodule HMC5883L.Driver do
   end
 
   defp write_config!(state) do
-    state.i2c.write(state.i2c_pid,<<0x00>> <> InterfaceControl.encode_config(state.config))
+    state.i2c.write(state.i2c_pid,<<0x00>> <> HMC5883L.InterfaceControl.encode_config(state.config))
   end
 
   # defp write_mode!(state, value) do
@@ -101,7 +101,7 @@ defmodule HMC5883L.Driver do
   defp read_heading_from_i2c!(state) do
     #write 0x03 then read 6 bytes
     state.i2c.write_read(HMC5883L.Utilities.i2c_name,<<0x03>>, 6)
-    |> InterfaceControl.decode_heading(state.config.scale)
+    |> HMC5883L.InterfaceControl.decode_heading(state.config.scale)
   end
 
   defp initialized, do: {:available, true} |> notify

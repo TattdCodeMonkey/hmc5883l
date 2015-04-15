@@ -20,7 +20,7 @@ defmodule HMC5883L.State do
   end
 
   def update({type, value}) when is_atom(type) do
-    Agent.update(@name, &Map.update(&1, type, value))
+    Agent.update(@name, &Map.update(&1, type, value, fn(_) -> value end))
   end
 
   defp init(config) do

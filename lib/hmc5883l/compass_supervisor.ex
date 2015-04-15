@@ -6,7 +6,7 @@ defmodule HMC5883L.CompassSupervisor do
 
   use Supervisor
 
-  def start_link do
+  def start_link(_) do
     Supervisor.start_link(__MODULE__, [])
   end
 
