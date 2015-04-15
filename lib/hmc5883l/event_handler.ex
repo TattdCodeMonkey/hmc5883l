@@ -18,7 +18,14 @@ defmodule HMC5883L.EventHandler do
     Logger.warn "Driver error #{error}"
     {:ok, state}
   end
-  
+
+  def handle_event({:raw_reading, _}, state), do: {:ok, state}
+  def handle_event({:scaled_reading, _}, state), do: {:ok, state}
+  def handle_event({:calibrated, _}, state) do
+    #TODO: save calibration offsets
+    #   with calibration offsets saved, need to used them to adjust raw readings before scaling  
+    {:ok, state}
+  end
   def handle_event({type, _} = event,state) when is_atom(type) do
     HMC5883L.State.update(event)
     {:ok, state}

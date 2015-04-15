@@ -65,7 +65,7 @@ defmodule HMC5883L.InterfaceControl do
 
   @spec encode_cfgb(%{}) :: <<_::8>>
   def encode_cfgb(%{gain: gain}), do: encode_cfgb(gain)
-  
+
   @spec encode_cfgb(number) :: <<_::8>>
   def encode_cfgb(gain) do
     bs_gain  = <<enc_gain(gain)::size(@gain_bit_len)>>
@@ -84,10 +84,10 @@ defmodule HMC5883L.InterfaceControl do
   ##########
   @spec default_modereg() :: <<_::8>>
   def default_modereg(), do: encode_modereg(:continuous)
-  
+
   @spec encode_modereg(%{}) :: <<_::8>>
   def encode_modereg(%{mode: mode}), do: encode_modereg(mode)
-  
+
   @spec encode_modereg(atom) :: <<_::8>>
   def encode_modereg(mode) do
     bs_highspeed_i2c = <<0::size(@high_spd_i2c)>> #always zero for now
@@ -109,24 +109,29 @@ defmodule HMC5883L.InterfaceControl do
   Takes the 6 byte heading reading from compass and decodes to a decimal degrees angle using the current gain scale value.
   """
   @spec decode_heading(<<_ :: 48>>, float) :: float
-  def decode_heading(<<x_raw :: size(16)-signed, _z_raw :: size(16)-signed, y_raw :: size(16)-signed>>, scale) do
+  def decode_heading(<<x_raw :: size(16)-signed, z_raw :: size(16)-signed, y_raw :: size(16)-signed>>, scale) do
     x_out = x_raw * scale
     y_out = y_raw * scale
-#   z_out = z_raw * scale
+    z_out = z_raw * scale
+
+    {:raw_reading, {x_raw, y_raw, z_raw}} |> notify
+    {:scaled_reading, {x_out, y_out, z_out}} |> notify
 
     :math.atan2(y_out,x_out)
     |> bearing_to_degrees
   end
 
   defp bearing_to_degrees(rad_ber) when rad_ber < 0 do
-    rad_ber + @one_radian 
+    rad_ber + @one_radian
     |> bearing_to_degrees
   end
   defp bearing_to_degrees(rad_ber) when rad_ber > @one_radian do
-    rad_ber - @one_radian 
+    rad_ber - @one_radian
     |> bearing_to_degrees
   end
    defp bearing_to_degrees(rad_ber) do
-    rad_ber * @rad_to_degrees 
+    rad_ber * @rad_to_degrees
   end
+
+  defp notify(msg), do: GenEvent.notify(HMC5883L.Utilities.event_manager, msg)
 end
