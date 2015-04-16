@@ -19,7 +19,10 @@ defmodule HMC5883L.EventHandler do
     {:ok, state}
   end
 
-  def handle_event({:raw_reading, _}, state), do: {:ok, state}
+  def handle_event({:raw_reading, _}, state) do 
+     
+    {:ok, state}
+  end
   def handle_event({:scaled_reading, _}, state), do: {:ok, state}
   def handle_event({:calibrated, _}, state) do
     #TODO: save calibration offsets

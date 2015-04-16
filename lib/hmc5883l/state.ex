@@ -11,6 +11,8 @@ defmodule HMC5883L.State do
 
   def calibrated?, do: get |> Map.get(:calibrated, false)
 
+  def available?, do: get |> Map.get(:available, false)
+
   def config, do: get |> Map.get(:config, %{})
 
   def gain, do: config |> Map.get(:gain, 1.3)
@@ -24,6 +26,6 @@ defmodule HMC5883L.State do
   end
 
   defp init(config) do
-    %{heading: 0.0, calibrated: false, config: config}
+    %{heading: 0.0, available: false, calibrated: false, config: config}
   end
 end

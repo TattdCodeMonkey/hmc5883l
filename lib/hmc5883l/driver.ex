@@ -1,6 +1,7 @@
 defmodule HMC5883L.Driver do
   use GenServer
   alias I2c
+  require Logger
 
   @read_interval 200
 
@@ -14,8 +15,9 @@ defmodule HMC5883L.Driver do
 
   #####
   # GenServer implementation
-  def init([config]) do
-    {:ok , %{config: config}}
+  def init([config, i2c]) do
+    i2c_pid = HMC5883L.Utilities.i2c_name |> Process.whereis
+    {:ok , %{config: config, i2c: i2c, i2c_pid: i2c_pid}}
   end
 
   def handle_cast(:initialize, state) do
@@ -34,12 +36,20 @@ defmodule HMC5883L.Driver do
   end
 
   def handle_info(:timed_read, state) do
-    state = read_heading!(state)
+    read_heading!(state)
     time_read()
     {:noreply, state}
   end
 
-  def handle_info(_msg, state), do: {:noreply, state}
+  def handle_info(:initialize, state) do
+    state = initialize!(state)
+    {:noreply, state}
+   end
+
+  def handle_info(msg, state) do 
+    Logger.warn("Unknown msg received #{inspect(msg)}")
+    {:noreply, state}
+  end
 
   def code_change(_old_vsn, state, _extra) do
     {:ok, state}
@@ -53,8 +63,10 @@ defmodule HMC5883L.Driver do
   #####
   # private methods
   defp initialize!(state) do
+    Logger.debug("initializing hmc5883l i2c driver")
+
     #write config. TODO: Change these for configured values
-    :ok = write_config! state
+    :ok = write_config!(state)
     #read heading
     read_heading!(state)
     #set timer for reading header
@@ -76,7 +88,7 @@ defmodule HMC5883L.Driver do
   end
 
   defp write_config!(state) do
-    state.i2c.write(state.i2c_pid,<<0x00>> <> HMC5883L.InterfaceControl.encode_config(state.config))
+    I2c.write(state.i2c_pid,<<0x00>> <> HMC5883L.InterfaceControl.encode_config(state.config))
   end
 
   # defp write_mode!(state, value) do
@@ -100,7 +112,7 @@ defmodule HMC5883L.Driver do
 
   defp read_heading_from_i2c!(state) do
     #write 0x03 then read 6 bytes
-    state.i2c.write_read(HMC5883L.Utilities.i2c_name,<<0x03>>, 6)
+    I2c.write_read(state.i2c_pid, <<0x03>>, 6)
     |> HMC5883L.InterfaceControl.decode_heading(state.config.scale)
   end
 

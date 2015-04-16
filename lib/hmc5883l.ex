@@ -42,7 +42,7 @@ defmodule HMC5883L do
   and decodes readings into a heading
   """
   @spec available? :: boolean
-  def available?, do: false
+  def available?, do: HMC5883L.State.available?
 
   @doc """
   Returns the currently configured gain settings.
