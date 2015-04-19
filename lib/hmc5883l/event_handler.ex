@@ -1,5 +1,6 @@
 defmodule HMC5883L.EventHandler do
   use GenEvent
+  alias HMC5883L.State
   import HMC5883L.Utilities
   require Logger
 
@@ -14,37 +15,15 @@ defmodule HMC5883L.EventHandler do
   end
 
   def init(_) do
-    state = {Map.new, 0.92}
-    {:ok, state}
+    {:ok, {}}
   end
 
   def handle_event({type, msg} = event, state) when is_atom(type) do
-    {event_logging, scale} = state
-    case Map.get(event_logging, type, false) do
-      false -> :ok
-      log_int -> event_logging = handle_logging(event,log_int, event_logging)
-    end
+    result = process_event(event)
 
-    process_event(event, {event_logging, scale}) 
-  end
-  
-  defp handle_logging(event, {freq, cnt}, state) do
-    {type, _} = event
-    new_cnt = cnt + 1
-    case rem(new_cnt, freq) do
-      0 -> 
-        new_cnt = 0
-        event |> log_event
-      _ -> :ok
-    end
-    
-    new_event_logging = Map.update(state.event_logging, type, {1,1}, fn(_) -> {freq, new_cnt} end) 
+    event |> check_logging
 
-    %{state| event_logging=> new_event_logging}
-  end
-  
-  defp log_event(event) do
-    event |> inspect |> Logger.info
+    result
   end
 
   defp process_event({:error, error}, state) do
@@ -52,19 +31,19 @@ defmodule HMC5883L.EventHandler do
     {:ok, state}
   end
 
-  defp process_event({:raw_reading, msg}, state) do 
+  defp process_event({:raw_reading, msg}, state) do
     {x, y, z} = msg
     sx = x * state.scale
     sy = y * state.scale
     sz = z * state.scale
-    
+
     {sx, sy, sz}
     |> notify
 
     {:ok, state}
   end
-  
-  defp process_event({:scaled_reading, msg}, state) do 
+
+  defp process_event({:scaled_reading, msg}, state) do
     {x, y, _z} = msg
 
     heading = :math.atan2(y,x) |> bearing_to_degrees
@@ -75,47 +54,68 @@ defmodule HMC5883L.EventHandler do
   end
 
   defp process_event({:heading, _} = event, state) do
-    HMC5883L.State.update(event) 
-    
+    HMC5883L.State.update(event)
+
     {:ok, state}
   end
-  
+
   defp process_event({:calibrated, _}, state) do
     {:ok, state}
   end
 
   defp process_event({:add_log, {type, freq}}, state) when is_atom(type) and is_number(freq) do
-    new_state = add_logging(type, freq, state)
+    add_logging(type, freq)
 
-    {:ok, new_state}
+    {:ok, state}
   end
 
   defp process_event({:add_log, type}, state) do
-    new_state = add_logging(type, 1, state)
+    add_logging(type, 1)
 
-    {:ok, new_state}
+    {:ok, state}
   end
- 
+
   defp process_event({:rem_log, type}, state) when is_atom(type) do
-    new_state = rem_logging(type, state) 
-    {:ok, new_state}
+    rem_logging(type)
+
+    {:ok, state}
   end
- 
+
   defp process_event({type, msg},state) when is_atom(type) do
     Logger.warn("Unknown event received.\nType: #{type}\nMsg: #{msg}")
 
     {:ok, state}
   end
 
-  defp add_logging(type, freq, state) do
-    new_logging = state.event_logging |> 
-      Map.update(type, {freq,0}, fn({_cF, it}) -> {freq,it} end)
-    new_state = %{state| event_logging=> new_logging}
+  defp add_logging(type, freq), do: State.add_event_logging(type, freq)
+
+  defp rem_logging(type), do: State.remove_event_logging(type)
+
+  defp check_logging(event) do
+    el = State.event_logging
+
+    case Map.get(el, type, false) do
+      false -> :ok
+      log_int -> handle_logging(event, log_int, event_logging)
+    end
   end
 
-  defp rem_logging(type, state) do
-    new_logging = state.event_logging |>
-      Map.delete(type)
-    new_state = %{state| event_logging=> new_logging}  
+  defp handle_logging(event, {freq, cnt}, el) do
+    {type, _} = event
+
+    new_cnt = cnt + 1
+    case rem(new_cnt, freq) do
+      0 ->
+        new_cnt = 0
+        event |> log_event
+      _ -> :ok
+    end
+
+    Map.update(state.event_logging, type, {1,1}, fn(_) -> {freq, new_cnt} end)
+    |> State.update_event_logging
+  end
+
+  defp log_event(event) do
+    event |> inspect |> Logger.info
   end
 end
