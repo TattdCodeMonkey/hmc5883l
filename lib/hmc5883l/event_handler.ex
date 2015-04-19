@@ -14,31 +14,31 @@ defmodule HMC5883L.EventHandler do
   end
 
   def init(_) do
-    state = %{event_logging=>Map.new, scale=> 0.0}
+    state = {Map.new, 0.92}
     {:ok, state}
   end
 
   def handle_event({type, msg} = event, state) when is_atom(type) do
-    case Map.get(state.event_logging, type, false) do
+    {event_logging, scale} = state
+    case Map.get(event_logging, type, false) do
       false -> :ok
-      log_int -> state = handle_logging(event,log_int, state)
+      log_int -> event_logging = handle_logging(event,log_int, event_logging)
     end
 
-    process_event(event, state) 
+    process_event(event, {event_logging, scale}) 
   end
   
   defp handle_logging(event, {freq, cnt}, state) do
     {type, _} = event
     new_cnt = cnt + 1
-    cond rem(new_cnt, freq) do
+    case rem(new_cnt, freq) do
       0 -> 
         new_cnt = 0
         event |> log_event
       _ -> :ok
     end
     
-    new_event_logging = state.event_logging
-                        |> Map.update(type, {1,1}, fun(_) -> {freq, new_cnt} end) 
+    new_event_logging = Map.update(state.event_logging, type, {1,1}, fn(_) -> {freq, new_cnt} end) 
 
     %{state| event_logging=> new_event_logging}
   end
