@@ -113,7 +113,7 @@ defmodule HMC5883L.Driver do
   defp read_heading_from_i2c!(state) do
     #write 0x03 then read 6 bytes
     I2c.write_read(state.i2c_pid, <<0x03>>, 6)
-    |> HMC5883L.InterfaceControl.decode_heading(state.config.scale)
+    |> HMC5883L.InterfaceControl.decode_heading
   end
 
   defp initialized, do: {:available, true} |> notify
@@ -122,5 +122,5 @@ defmodule HMC5883L.Driver do
 
   defp terminated, do: {:available, false} |> notify
 
-  defp notify(msg), do: GenEvent.notify(HMC5883L.Utilities.event_manager, msg)
+  defp notify(msg), do: HMC5883L.Utilities.notify(msg)
 end

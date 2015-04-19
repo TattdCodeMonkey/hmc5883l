@@ -1,9 +1,6 @@
 defmodule HMC5883L.InterfaceControl do
   import HMC5883L.Utilities
 
-  @one_radian 6.283185307179586
-  @rad_to_degrees 57.29577951308232
-
   @avg_bit_len    2
   @drate_bit_len  3
   @bias_bit_len   2
@@ -109,29 +106,13 @@ defmodule HMC5883L.InterfaceControl do
   Takes the 6 byte heading reading from compass and decodes to a decimal degrees angle using the current gain scale value.
   """
   @spec decode_heading(<<_ :: 48>>, float) :: float
-  def decode_heading(<<x_raw :: size(16)-signed, z_raw :: size(16)-signed, y_raw :: size(16)-signed>>, scale) do
-    x_out = x_raw * scale
-    y_out = y_raw * scale
-    z_out = z_raw * scale
-
+  def decode_heading(data) do
+    <<
+      x_raw :: size(16)-signed, 
+      z_raw :: size(16)-signed, 
+      y_raw :: size(16)-signed
+    >> = data
+    
     {:raw_reading, {x_raw, y_raw, z_raw}} |> notify
-    {:scaled_reading, {x_out, y_out, z_out}} |> notify
-
-    :math.atan2(y_out,x_out)
-    |> bearing_to_degrees
   end
-
-  defp bearing_to_degrees(rad_ber) when rad_ber < 0 do
-    rad_ber + @one_radian
-    |> bearing_to_degrees
-  end
-  defp bearing_to_degrees(rad_ber) when rad_ber > @one_radian do
-    rad_ber - @one_radian
-    |> bearing_to_degrees
-  end
-   defp bearing_to_degrees(rad_ber) do
-    rad_ber * @rad_to_degrees
-  end
-
-  defp notify(msg), do: GenEvent.notify(HMC5883L.Utilities.event_manager, msg)
 end
