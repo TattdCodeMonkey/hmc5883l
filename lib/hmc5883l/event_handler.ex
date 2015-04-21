@@ -69,7 +69,7 @@ defmodule HMC5883L.EventHandler do
 
   defp process_event({:add_log, _}, state), do: {:ok, state}
 
-  defp process_event({:rem_log, _}, state), do: {:ok, state}
+  defp process_event({:remove_log, _}, state), do: {:ok, state}
 
   defp process_event({type, msg},state) when is_atom(type) do
     Logger.warn("Unknown event received.\nType: #{type}\nMsg: #{inspect msg}")

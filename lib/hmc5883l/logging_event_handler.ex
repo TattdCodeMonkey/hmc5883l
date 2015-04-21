@@ -3,6 +3,11 @@ defmodule HMC5883L.LoggingEventHandler do
   alias HMC5883L.State
   require Logger
 
+  def add_logging(type, freq), do: {:add_log, {type, freq}} |> HMC5883L.Utilities.notify
+
+  def add_logging(type), do: add_logging(type, 1)
+
+  def remove_logging(type), do: {:remove_log, type} |> HMC5883L.Utilities.notify
   def handle_event({type, _msg} = event, state) do
     event_logging = State.event_logging
 
@@ -35,19 +40,17 @@ defmodule HMC5883L.LoggingEventHandler do
   end
 
   defp process_event({:add_log, {type, freq}}) when is_atom(type) and is_number(freq) do
-    Logger.debug("Added event logging for #{type}, every #{freq} event will be logged")
+    Logger.debug("Adding event logging for #{type}, every #{freq} event(s) will be logged")
 
     State.add_event_logging(type, freq)
   end
 
   defp process_event({:add_log, type}) do
-    Logger.debug("Added event logging for #{type}, every event will be logged")
-
-    State.add_event_logging(type, 1)
+    process_event({:add_log, {type, 1}})
   end
 
   defp process_event({:remove_log, type}) when is_atom(type) do
-    Logger.debug("Remvoed event logging for #{type}")
+    Logger.debug("Removing event logging for #{type}")
 
     State.remove_event_logging(type)
   end
