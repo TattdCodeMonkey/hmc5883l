@@ -27,8 +27,8 @@ Currently being developed on a Raspberry Pi running raspbian, will be tested on 
 	- gain/0: returns the currently configured gain setting
 - **HMC5883L.EventHandler:** Handles events from driver to update HMC5883L.State
 - **HMC5883L.EventManager:**
-	- {:raw_reading, {x,y,z}} - TODO
-	- {:scaled_reading, {x,y,z}} - TODO
+	- {:raw_reading, {x,y,z}} - raised with raw x, y, z axis reading from i2c bus
+	- {:scaled_reading, {x,y,z}} - raised with scaled x, y, z axis reading from i2c bus. scale is based on current gain setting
 	- {:calibrated, {x_offset, y_offset, z_offset}} - TODO
 	- {:heading, decoded_heading} - raised when heading is decoded from a raw reading
 	- {:available, boolean_availibity} - raised with true when HMC5883L.Driver is successfully initialized, raised with false when HMC5883L.Driver terminates

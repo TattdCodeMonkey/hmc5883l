@@ -166,17 +166,19 @@ defmodule HMC5883L.Utilities do
     230 -> 4.35
   end
 
-  defp notify(msg), do: GenEvent.notify(event_manager, msg)
+  def notify(msg), do: GenEvent.notify(event_manager, msg)
 
-  defp bearing_to_degrees(rad_ber) when rad_ber < 0 do
+  def bearing_to_degrees(rad_ber) when rad_ber < 0 do
     rad_ber + @one_radian
     |> bearing_to_degrees
   end
-  defp bearing_to_degrees(rad_ber) when rad_ber > @one_radian do
+  
+  def bearing_to_degrees(rad_ber) when rad_ber > @one_radian do
     rad_ber - @one_radian
     |> bearing_to_degrees
   end
-   defp bearing_to_degrees(rad_ber) do
+  
+  def bearing_to_degrees(rad_ber) do
     rad_ber * @rad_to_degrees
   end
 end
