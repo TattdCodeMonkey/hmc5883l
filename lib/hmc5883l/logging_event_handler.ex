@@ -1,5 +1,6 @@
 defmodule HMC5883L.LoggingEventHandler do
   use GenEvent
+  alias HMC5883L.State
   require Logger
 
   def handle_event({type, _msg} = event, state) do
@@ -50,4 +51,9 @@ defmodule HMC5883L.LoggingEventHandler do
 
     State.remove_event_logging(type)
   end
+
+  @doc """
+  ignore all other events
+  """
+  defp process_event(_), do: :ok
 end

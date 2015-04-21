@@ -1,5 +1,6 @@
 defmodule HMC5883L.EventHandler do
   use GenEvent
+  alias HMC5883L.State
   import HMC5883L.Utilities
   require Logger
 
@@ -7,6 +8,7 @@ defmodule HMC5883L.EventHandler do
     case GenEvent.start_link(name: event_manager) do
       {:ok, pid} ->
         :ok = GenEvent.add_handler(pid, __MODULE__, [])
+        :ok = GenEvent.add_handler(pid, HMC5883L.LoggingEventHandler, [])
         {:ok, pid}
       {:error, {:already_started, _pid}} ->
         :ignore
@@ -14,8 +16,7 @@ defmodule HMC5883L.EventHandler do
   end
 
   def init(_) do
-    state = {Map.new, 0.92}
-    {:ok, state}
+    {:ok, {}}
   end
 
   def handle_event(event, state), do: process_event(event, state)
@@ -51,6 +52,12 @@ defmodule HMC5883L.EventHandler do
   end
 
   defp process_event({:heading, _} = event, state) do
+    HMC5883L.State.update(event)
+
+    {:ok, state}
+  end
+  
+  defp process_event({:available, _} = event, state) do
     HMC5883L.State.update(event)
 
     {:ok, state}
