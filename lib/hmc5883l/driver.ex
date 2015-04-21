@@ -36,8 +36,8 @@ defmodule HMC5883L.Driver do
   end
 
   def handle_info(:timed_read, state) do
-    read_heading!(state)
     time_read()
+    read_heading!(state)
     {:noreply, state}
   end
 
@@ -46,7 +46,7 @@ defmodule HMC5883L.Driver do
     {:noreply, state}
    end
 
-  def handle_info(msg, state) do 
+  def handle_info(msg, state) do
     Logger.warn("Unknown msg received #{inspect(msg)}")
     {:noreply, state}
   end
@@ -78,8 +78,7 @@ defmodule HMC5883L.Driver do
   defp time_read(), do: Process.send_after(self(),:timed_read, @read_interval)
 
   defp read_heading!(state) do
-    bearing_degrees = read_heading_from_i2c!(state)
-    {:heading, bearing_degrees} |> notify
+    read_heading_from_i2c!(state)
   end
 
   defp calibrate(state) do
