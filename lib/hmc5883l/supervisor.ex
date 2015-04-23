@@ -7,9 +7,11 @@ defmodule HMC5883L.Supervisor do
   def start_link, do: Supervisor.start_link(__MODULE__, [])
 
   def init(_) do
+    config = HMC5883L.CompassConfiguration.load_from_env
+
     [
-      worker(GenEvent, [name: HMC5883L.Utilities.event_manager]),
-      worker(HMC5883L.EventHandlerWatcher, []),
+      worker(HMC5883L.State, [config]),
+      supervisor(HMC5883L.EventSupervisor, []),
       supervisor(HMC5883L.CompassSupervisor, [])
     ]
     |> supervise([strategy: :one_for_one, name: __MODULE__])

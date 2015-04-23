@@ -2,14 +2,13 @@ defmodule HMC5883L.EventHandlerWatcher do
   use GenServer
   require Logger
 
-  @doc """
 
-  """
   def start_link(_) do
-    start_handler
+    :ok
   end
 
   def init(_) do
+    start_handler
     {:ok, {}}
   end
 
@@ -99,5 +98,4 @@ defmodule HMC5883L.EventHandler do
 
     {:ok, state}
   end
-
 end

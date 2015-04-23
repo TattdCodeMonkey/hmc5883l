@@ -9,9 +9,7 @@ defmodule HMC5883L do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    config = HMC5883L.CompassConfiguration.load_from_env
     children = [
-      worker(HMC5883L.State, [config]),
       supervisor(HMC5883L.Supervisor, [])
     ]
 
