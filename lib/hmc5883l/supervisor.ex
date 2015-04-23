@@ -8,7 +8,8 @@ defmodule HMC5883L.Supervisor do
 
   def init(_) do
     [
-      worker(HMC5883L.EventHandler, []),
+      worker(GenEvent, [name: HMC5883L.Utilities.event_manager]),
+      worker(HMC5883L.EventHandlerWatcher, []),
       supervisor(HMC5883L.CompassSupervisor, [])
     ]
     |> supervise([strategy: :one_for_one, name: __MODULE__])
