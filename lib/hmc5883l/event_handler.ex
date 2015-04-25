@@ -40,23 +40,24 @@ defmodule HMC5883L.EventHandlerWatcher do
 end
 
 defmodule HMC5883L.EventHandler do
+  use GenEvent
   alias HMC5883L.State
   import HMC5883L.Utilities
   require Logger
 
-  def init(_) do
-    {:ok, {}}
+  def init(parent) do
+    {:ok, parent}
   end
 
-  def handle_event(event, state), do: process_event(event, state)
+  def handle_event(event, parent) do
+    process_event(event)
 
-  defp process_event({:error, error}, state) do
-    Logger.warn("Driver error #{error}")
-
-    {:ok, state}
+    {:ok, parent}
   end
 
-  defp process_event({:raw_reading, msg}, state) do
+  defp process_event({:error, error}), do: Logger.warn("Driver error #{error}")
+
+  defp process_event({:raw_reading, msg}) do
     {x, y, z} = msg
 
     scale = State.scale
@@ -67,35 +68,28 @@ defmodule HMC5883L.EventHandler do
 
     {:scaled_reading, {sx, sy, sz}}
     |> notify
-
-    {:ok, state}
   end
 
-  defp process_event({:scaled_reading, msg}, state) do
+  defp process_event({:scaled_reading, msg}) do
     {x, y, _z} = msg
 
     heading = :math.atan2(y,x) |> bearing_to_degrees
 
-    {:heading, heading} |> notify
-
-    {:ok, state}
+    {:heading, heading}
+    |> notify
   end
 
-  defp process_event({type, _} = event, state) when type in [:heading, :available, :calibrated] do
+  defp process_event({type, _} = event)
+    when type in [:heading, :available, :calibrated] do
     HMC5883L.State.update(event)
-
-    {:ok, state}
   end
 
-  defp process_event({type, msg},state) when is_atom(type) do
+  defp process_event({type, msg})
+    when is_atom(type) do
     Logger.warn("Unknown event received.\nType: #{type}\nMsg: #{inspect msg}")
-
-    {:ok, state}
   end
 
-  defp process_event(event, state) do
+  defp process_event(event) do
     Logger.warn("Unknown event received.\n#{inspect event}")
-
-    {:ok, state}
   end
 end
