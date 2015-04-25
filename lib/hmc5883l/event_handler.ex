@@ -35,7 +35,7 @@ defmodule HMC5883L.EventHandlerWatcher do
   end
 
   defp start_handler do
-    :ok = GenEvent.add_handler(HMC5883L.Utilities.event_manager, HMC5883L.EventHandler, [])
+    :ok = GenEvent.add_handler(HMC5883L.Utilities.event_manager, HMC5883L.EventHandler, self())
   end
 end
 
