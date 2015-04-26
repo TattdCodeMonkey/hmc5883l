@@ -5,8 +5,8 @@ defmodule HMC5883L.EventSupervisor do
 
   def init(_) do
     [
-      worker(GenEvent, [name: HMC5883L.Utilities.event_manager]),
-      worker(HMC5883L.EventHandlerWatcher, [])
+      worker(GenEvent, [[name: HMC5883L.Utilities.event_manager]]),
+      worker(HMC5883L.EventHandlerWatcher, [[]])
     ]
     |> supervise(strategy: :one_for_all)
   end

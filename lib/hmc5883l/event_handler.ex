@@ -2,9 +2,8 @@ defmodule HMC5883L.EventHandlerWatcher do
   use GenServer
   require Logger
 
-
   def start_link(_) do
-    :ok
+    GenServer.start_link(__MODULE__, [])
   end
 
   def init(_) do
