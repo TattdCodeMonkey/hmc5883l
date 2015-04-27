@@ -108,11 +108,11 @@ defmodule HMC5883L.InterfaceControl do
   @spec decode_heading(<<_ :: 48>>) :: atom
   def decode_heading(data) do
     <<
-      x_raw :: size(16)-signed, 
-      z_raw :: size(16)-signed, 
+      x_raw :: size(16)-signed,
+      z_raw :: size(16)-signed,
       y_raw :: size(16)-signed
     >> = data
-    
+
     {:raw_reading, {x_raw, y_raw, z_raw}} |> notify
   end
 end

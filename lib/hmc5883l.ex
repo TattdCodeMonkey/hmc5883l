@@ -26,15 +26,6 @@ defmodule HMC5883L do
   def heading, do: HMC5883L.State.heading
 
   @doc """
-  Returns if the compass as been locally calibrated.
-
-  Calibration consists of calculating offsets for raw readings based on
-  variations over many readings while the compass is not moving.
-  """
-  @spec calibrated? :: boolean
-  def calibrated?, do: HMC5883L.State.calibrated?
-
-  @doc """
   Returns if the compass driver is currently running
   The compass driver is the process that reads from the i2c bus
   and decodes readings into a heading

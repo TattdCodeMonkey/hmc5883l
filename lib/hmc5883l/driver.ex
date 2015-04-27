@@ -25,11 +25,6 @@ defmodule HMC5883L.Driver do
     {:noreply, state}
   end
 
-  def handle_cast(:calibrate, state) do
-    state = calibrate(state)
-    {:noreply, state}
-  end
-
   def handle_cast(:read_heading, state) do
     state = read_heading!(state)
     {:noreply, state}
@@ -81,11 +76,6 @@ defmodule HMC5883L.Driver do
     read_heading_from_i2c!(state)
   end
 
-  defp calibrate(state) do
-
-    state
-  end
-
   defp write_config!(state) do
     I2c.write(state.i2c_pid,<<0x00>> <> HMC5883L.InterfaceControl.encode_config(state.config))
   end
@@ -116,8 +106,6 @@ defmodule HMC5883L.Driver do
   end
 
   defp initialized, do: {:available, true} |> notify
-
-  # defp calibrated, do: {:calibrated, true} |> notify
 
   defp terminated, do: {:available, false} |> notify
 

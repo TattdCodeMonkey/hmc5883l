@@ -79,7 +79,7 @@ defmodule HMC5883L.EventHandler do
   end
 
   defp process_event({type, _} = event)
-    when type in [:heading, :available, :calibrated] do
+    when type in [:heading, :available] do
     HMC5883L.State.update(event)
   end
 

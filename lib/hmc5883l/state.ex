@@ -9,8 +9,6 @@ defmodule HMC5883L.State do
 
   def heading, do: get |> Map.get(:heading, 0.0)
 
-  def calibrated?, do: get |> Map.get(:calibrated, false)
-
   def available?, do: get |> Map.get(:available, false)
 
   def config, do: get |> Map.get(:config, %{})
@@ -18,28 +16,6 @@ defmodule HMC5883L.State do
   def gain, do: config |> Map.get(:gain, 1.3)
 
   def scale, do: config |> Map.get(:scale, 0.92)
-
-  def event_logging, do: get |> Map.get(:event_logging)
-
-  def add_event_logging(type, freq) do
-    Agent.update(@name, &Map.update(&1, :event_logging, %{},
-      fn(el) ->
-        el
-        |> Map.update(type, {freq,0}, fn({_cF, it}) -> {freq,it} end)
-      end))
-  end
-
-  def update_event_logging(el) do
-    Agent.update(@name, &Map.update(&1, :event_logging, el, fn(_)-> el end))
-  end
-
-  def remove_event_logging(type) do
-    Agent.update(@name, &Map.update(&1, :event_logging, %{},
-      fn(el) ->
-        el
-        |> Map.delete(type)
-      end))
-  end
 
   def update({type, %{} = value}) when is_atom(type) do
     Agent.update(@name, &Map.merge(&1, value))
@@ -50,6 +26,6 @@ defmodule HMC5883L.State do
   end
 
   defp init(config) do
-    %{heading: 0.0, available: false, calibrated: false, config: config, event_logging: Map.new}
+    %{heading: 0.0, available: false, config: config}
   end
 end
