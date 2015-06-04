@@ -1,57 +1,17 @@
-defmodule HMC5883L.EventHandlerWatcher do
-  use GenServer
-  require Logger
-
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, [])
-  end
-
-  def init(_) do
-    start_handler
-    {:ok, {}}
-  end
-
-  def handle_info({:gen_event_EXIT, handler, reason}, state)
-      when reason in [:normal, :shutdown] do
-    {:stop, reason, state}
-  end
-
-  def handle_info({:gen_event_EXIT, handler, reason}, state) do
-    Logger.warn("HMC5883L.EventHandler exited with reason: #{reason}. restarting...")
-
-    start_handler
-    {:noreply, state}
-  end
-
-  def handle_info({:stop, reason}, state) do
-    {:stop, reason, state}
-  end
-
-  def handle_info(msg, state) do
-    Logger.info("Unexpected message received: #{inspect msg}")
-
-    {:noreply, state}
-  end
-
-  defp start_handler do
-    :ok = GenEvent.add_handler(HMC5883L.Utilities.event_manager, HMC5883L.EventHandler, self())
-  end
-end
-
 defmodule HMC5883L.EventHandler do
   use GenEvent
   alias HMC5883L.State
   import HMC5883L.Utilities
   require Logger
 
-  def init(parent) do
-    {:ok, parent}
+  def init(args) do
+    {:ok, args}
   end
 
-  def handle_event(event, parent) do
+  def handle_event(event, args) do
     process_event(event)
 
-    {:ok, parent}
+    {:ok, args}
   end
 
   defp process_event({:error, error}), do: Logger.warn("Driver error #{error}")

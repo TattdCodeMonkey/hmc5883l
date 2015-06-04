@@ -66,5 +66,4 @@ defmodule HMC5883L.I2cConfiguration_Tests do
 
     assert config.dev_id == default.dev_id
   end
-
 end
