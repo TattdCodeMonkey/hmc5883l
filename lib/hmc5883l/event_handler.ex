@@ -19,11 +19,11 @@ defmodule HMC5883L.EventHandler do
   defp process_event({:raw_reading, msg}) do
     {x, y, z} = msg
 
-    scale = State.scale
+    {xy_gauss,z_gauss} = State.axis_gauss
 
-    sx = x * scale
-    sy = y * scale
-    sz = z * scale
+    sx = x / xy_gauss * 100
+    sy = y / xy_gauss * 100
+    sz = z / z_gauss * 100
 
     {:scaled_reading, {sx, sy, sz}}
     |> notify

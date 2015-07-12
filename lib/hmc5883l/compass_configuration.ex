@@ -1,8 +1,8 @@
 defmodule HMC5883L.CompassConfiguration do
-  defstruct averaging: 8, data_rate: 15, bias: :normal, gain: 1.3, mode: :continuous, scale: 0.0
+  defstruct averaging: 8, data_rate: 15, bias: :normal, gain: 1.3, mode: :continuous, gauss: {1090, 980}
   alias __MODULE__
   alias HMC5883L.Utilities
-  @type t :: %CompassConfiguration{averaging: number, data_rate: number, bias: atom, gain: number, mode: atom, scale: number}
+  @type t :: %CompassConfiguration{averaging: number, data_rate: number, bias: atom, gain: number, mode: atom, gauss: {number, number}}
   import MultiDef
 
   @moduledoc """
@@ -79,7 +79,7 @@ defmodule HMC5883L.CompassConfiguration do
   def load_compass_config(config) do
     Application.get_env(:hmc5883l, :compass)
     |> load_config_from_array(config)
-    |> set_scale
+    |> set_axis_gauss
   end
 
   @spec load_config_from_array(List, t) :: t
@@ -94,9 +94,8 @@ defmodule HMC5883L.CompassConfiguration do
     {:averaging, avg}, config -> %{config| averaging: avg}
   end
 
-  @spec set_scale(t) :: t
-  def set_scale(%CompassConfiguration{} = config) do
-    scale = Utilities.get_scale(config.gain)
-    %{config| scale: scale}
+  @spec set_axis_gauss(t) :: t
+  def set_axis_gauss(%CompassConfiguration{} = config) do
+    %{config| gauss: Utilities.get_axis_gauss(config.gain)}
   end
 end

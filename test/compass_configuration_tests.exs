@@ -4,16 +4,16 @@ defmodule HMC5883L.CompassConfiguration_Tests do
 
   test "empty array, loads default compass config" do
     :application.set_env(:hmc5883l, :compass, [])
-    assert CompassConfiguration.load_from_env() == (CompassConfiguration.new |> CompassConfiguration.set_scale)    
+    assert CompassConfiguration.load_from_env() == (CompassConfiguration.new |> CompassConfiguration.set_axis_gauss)    
   end
- 
+
   test "compass configuration is loaded - gain and scale set" do
-    :application.set_env(:hmc5883l, :compass, [gain: 230])
+    :application.set_env(:hmc5883l, :compass, [gain: 8.1])
 
     appCfg = CompassConfiguration.load_compass_config(CompassConfiguration.new)
 
-    assert appCfg.gain == 230
-    assert appCfg.scale == 4.35 
+    assert appCfg.gain == 8.1
+    assert appCfg.gauss == {230, 205}
   end
 
 end

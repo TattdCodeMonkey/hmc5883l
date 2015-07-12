@@ -3,7 +3,7 @@ defmodule Hmc5883l.Mixfile do
 
   def project do
     [app: :hmc5883l,
-     version: "0.3.0",
+     version: "0.4.0",
      elixir: "~> 1.0",
      deps: deps ++ deps(operating_system),
      test_coverage: [tool: ExCoveralls],

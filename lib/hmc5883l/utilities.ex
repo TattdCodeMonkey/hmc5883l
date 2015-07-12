@@ -146,24 +146,18 @@ defmodule HMC5883L.Utilities do
     <<6::size(3)>> -> dec_datarate(0x06)
   end
 
-  @spec get_scale(number) :: number
-  mdef get_scale do
-    0.88 -> 0.73
-    1.3 -> 0.92
-    1.9 -> 1.22
-    2.5 -> 1.52
-    4.0 -> 2.27
-    4.7 -> 2.56
-    5.6 -> 3.03
-    8.1 -> 4.35
-    1370 -> 0.73
-    1090 -> 0.92
-    820 -> 1.22
-    660 -> 1.52
-    440 -> 2.27
-    390 -> 2.56
-    330 -> 3.03
-    230 -> 4.35
+  @spec get_axis_gauss(number) :: {number, number}
+  def get_axis_gauss(gain) do
+    case (gain) do
+      0.88 -> {1370, 1230}
+      1.3 -> {1090, 980}
+      1.9 -> {820, 760}
+      2.5 -> {660, 600}
+      4.0 -> {440, 400}
+      4.7 -> {390, 355}
+      5.6 -> {330, 295}
+      8.1 -> {230, 205}
+    end
   end
 
   def notify(msg), do: GenEvent.notify(event_manager, msg)
@@ -172,12 +166,12 @@ defmodule HMC5883L.Utilities do
     rad_ber + @one_radian
     |> bearing_to_degrees
   end
-  
+
   def bearing_to_degrees(rad_ber) when rad_ber > @one_radian do
     rad_ber - @one_radian
     |> bearing_to_degrees
   end
-  
+
   def bearing_to_degrees(rad_ber) do
     rad_ber * @rad_to_degrees
   end

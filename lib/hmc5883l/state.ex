@@ -15,7 +15,7 @@ defmodule HMC5883L.State do
 
   def gain, do: config |> Map.get(:gain, 1.3)
 
-  def scale, do: config |> Map.get(:scale, 0.92)
+  def axis_gauss, do: config |> Map.get(:gauss, {1090, 980})
 
   def update({type, %{} = value}) when is_atom(type) do
     Agent.update(@name, &Map.merge(&1, value))
