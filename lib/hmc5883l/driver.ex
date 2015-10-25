@@ -1,6 +1,5 @@
 defmodule HMC5883L.Driver do
   use GenServer
-  alias I2c
   require Logger
 
   @read_interval 200
@@ -72,12 +71,14 @@ defmodule HMC5883L.Driver do
 
   defp time_read(), do: Process.send_after(self(),:timed_read, @read_interval)
 
+  defp read_heading!(%{i2c_pid: nil} = state), do: :ok
   defp read_heading!(state) do
     read_heading_from_i2c!(state)
   end
 
+  defp write_config!(%{i2c_pid: nil} = state), do: :ok
   defp write_config!(state) do
-    I2c.write(state.i2c_pid,<<0x00>> <> HMC5883L.InterfaceControl.encode_config(state.config))
+    state.i2c.write(state.i2c_pid,<<0x00>> <> HMC5883L.InterfaceControl.encode_config(state.config))
   end
 
   # defp write_mode!(state, value) do
@@ -101,7 +102,7 @@ defmodule HMC5883L.Driver do
 
   defp read_heading_from_i2c!(state) do
     #write 0x03 then read 6 bytes
-    I2c.write_read(state.i2c_pid, <<0x03>>, 6)
+    state.i2c.write_read(state.i2c_pid, <<0x03>>, 6)
     |> HMC5883L.InterfaceControl.decode_heading
   end
 

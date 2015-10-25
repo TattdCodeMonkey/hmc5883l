@@ -1,7 +1,7 @@
 defmodule HMC5883L.EventSupervisor do
   use Supervisor
 
-  def start_link, do: Supervisor.start_link(__MODULE__, [])
+  def start_link, do: Supervisor.start_link(__MODULE__, [], [])
 
   def init(_) do
     [

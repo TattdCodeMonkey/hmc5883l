@@ -7,7 +7,9 @@ defmodule HMC5883L.Utilities do
   @one_radian 6.283185307179586
   @rad_to_degrees 57.29577951308232
 
+  @spec event_manager() :: atom
   def event_manager, do: @event_manager
+  @spec i2c_name() :: atom
   def i2c_name, do: @i2c_name
 
   mdef enc_samplingavg do
@@ -146,7 +148,11 @@ defmodule HMC5883L.Utilities do
     <<6::size(3)>> -> dec_datarate(0x06)
   end
 
-  @spec get_axis_gauss(number) :: {number, number}
+
+  @spec get_axis_gauss(float) :: {
+    230 | 330 | 390 | 440 | 660 | 820 | 1090 | 1370,
+    205 | 295 | 355 | 400 | 600 | 760 | 980 | 1230
+  }
   def get_axis_gauss(gain) do
     case (gain) do
       0.88 -> {1370, 1230}

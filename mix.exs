@@ -52,7 +52,7 @@ defmodule Hmc5883l.Mixfile do
   end
 
   def operating_system do
-    case Application.get_env(:ada_imu, :operating_system) do
+    case Application.get_env(:hmc5883l, :operating_system) do
       nil ->
         Port.open({:spawn, "uname"}, [])
 
@@ -65,7 +65,7 @@ defmodule Hmc5883l.Mixfile do
         |> to_string
         |> String.replace("\n", "")
 
-        :application.set_env(:ada_imu, :operating_system, result)
+        :application.set_env(:hmc5883l, :operating_system, result)
 
         result
       os_value -> os_value
