@@ -4,10 +4,12 @@ defmodule HMC5883L.Driver do
 
   @read_interval 200
 
+  defp name, do: __MODULE__
+
   #####
   # External API
   def start_link(config) do
-    {:ok, pid} = GenServer.start_link(__MODULE__, config, name: __MODULE__)
+    {:ok, pid} = GenServer.start_link(__MODULE__, config, name: name)
     Process.send_after(pid,:initialize, @read_interval)
     {:ok, pid}
   end
@@ -112,3 +114,4 @@ defmodule HMC5883L.Driver do
 
   defp notify(msg), do: HMC5883L.Utilities.notify(msg)
 end
+

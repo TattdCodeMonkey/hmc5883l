@@ -1,28 +1,39 @@
 defmodule HMC5883L.State do
-  @name __MODULE__
+
+  defp name, do: __MODULE__
 
   def start_link(config) do
-    Agent.start_link(fn -> init(config) end, name: @name)
+    Agent.start_link(fn -> init(config) end, name: name)
   end
 
-  def get, do: Agent.get(@name, &(&1))
+  def get, do: name |> get
+  def get(pid), do: Agent.get(pid, &(&1))
 
-  def heading, do: get |> Map.get(:heading, 0.0)
+  def heading, do: name |> heading
+  def heading(pid), do: pid |> get |> Map.get(:heading, 0.0)
 
-  def available?, do: get |> Map.get(:available, false)
+  def available?, do: name |> available?
+  def available?(pid), do: pid |> get |> Map.get(:available, false)
 
-  def config, do: get |> Map.get(:config, %{})
+  def config, do: name |> config
+  def config(pid), do: pid |> get |> Map.get(:config, %{})
 
-  def gain, do: config |> Map.get(:gain, 1.3)
+  def gain, do: name |> gain
+  def gain(pid), do: pid |> config |> Map.get(:gain, 1.3)
 
-  def axis_gauss, do: config |> Map.get(:gauss, {1090, 980})
+  def axis_gauss, do: name |> axis_gauss
+  def axis_gauss(pid), do: pid |> config |> Map.get(:gauss, {1090, 980})
 
-  def update({type, %{} = value}) when is_atom(type) do
-    Agent.update(@name, &Map.merge(&1, value))
+  def update(data) do
+    name |> update(data)
   end
 
-  def update({type, value}) when is_atom(type) do
-    Agent.update(@name, &Map.update(&1, type, value, fn(_) -> value end))
+  def update(pid, {type, %{} = value}) when is_atom(type) do
+    Agent.update(pid, &Map.merge(&1, value))
+  end
+
+  def update(pid, {type, value}) when is_atom(type) do
+    Agent.update(pid, &Map.update(&1, type, value, fn(_) -> value end))
   end
 
   defp init(config) do

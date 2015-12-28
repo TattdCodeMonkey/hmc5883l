@@ -3,6 +3,8 @@ defmodule HMC5883L.Supervisor do
   """
   use Supervisor
 
+  defp name, do: __MODULE__
+
   @spec start_link() :: Supervisor.on_start
   def start_link, do: Supervisor.start_link(__MODULE__, [], [])
 
@@ -15,6 +17,6 @@ defmodule HMC5883L.Supervisor do
       supervisor(HMC5883L.EventSupervisor, []),
       supervisor(HMC5883L.CompassSupervisor, [])
     ]
-    |> supervise([strategy: :one_for_one, name: __MODULE__])
+    |> supervise([strategy: :one_for_one, name: name])
   end
 end
