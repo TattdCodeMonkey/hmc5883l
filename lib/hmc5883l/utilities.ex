@@ -1,17 +1,9 @@
 defmodule HMC5883L.Utilities do
   import MultiDef
 
-  @event_manager HMC5883L.EventManager
-  @i2c_name HMC5883L.I2c
-
   @one_radian 6.283185307179586
   @rad_to_degrees 57.29577951308232
-
-  @spec event_manager() :: atom
-  def event_manager, do: @event_manager
-  @spec i2c_name() :: atom
-  def i2c_name, do: @i2c_name
-
+  
   mdef enc_samplingavg do
     1 -> 0x00
     2 -> 0x01
@@ -166,7 +158,7 @@ defmodule HMC5883L.Utilities do
     end
   end
 
-  def notify(msg), do: GenEvent.notify(event_manager, msg)
+  def notify(name, msg), do: GenEvent.notify(name, msg)
 
   def bearing_to_degrees(rad_ber) when rad_ber < 0 do
     rad_ber + @one_radian

@@ -22,16 +22,16 @@ defmodule HMC5883L do
 
   Defaults to 0.0 on application statup
   """
-  @spec heading :: number
-  def heading, do: HMC5883L.State.heading
+  #@spec heading :: number
+  #def heading, do: HMC5883L.State.heading
 
   @doc """
   Returns if the compass driver is currently running
   The compass driver is the process that reads from the i2c bus
   and decodes readings into a heading
   """
-  @spec available? :: boolean
-  def available?, do: HMC5883L.State.available?
+  #@spec available? :: boolean
+  #def available?, do: HMC5883L.State.available?
 
   @doc """
   Returns the currently configured gain settings.
@@ -52,7 +52,7 @@ defmodule HMC5883L do
   ±8.1|230|4.35
 
   """
-  @spec gain :: number
-  def gain, do: HMC5883L.State.gain
+  #@spec gain :: number
+  #def gain, do: HMC5883L.State.gain
 
 end

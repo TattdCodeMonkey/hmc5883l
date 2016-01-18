@@ -3,10 +3,9 @@ defmodule Hmc5883l.Mixfile do
 
   def project do
     [app: :hmc5883l,
-     version: "0.4.0",
+     version: "0.5.0",
      elixir: "~> 1.0",
      deps: deps ++ deps(operating_system),
-     test_coverage: [tool: ExCoveralls],
      package: package()
     ]
   end
@@ -14,7 +13,7 @@ defmodule Hmc5883l.Mixfile do
   def application do
     [
       applications: [:logger],
-      env: [board: :pi, i2c: [], compass: []],
+      env: [],
       registered: [:hmc5883l],
       mod: {HMC5883L, []}
     ]
@@ -32,14 +31,13 @@ defmodule Hmc5883l.Mixfile do
       {:mon_handler, "~>1.0"},
       {:multidef, "~>0.2"},
       {:dialyze, "~> 0.1.4", optional: true},
-      {:excoveralls, github: 'parroty/excoveralls', only: [:dev, :test]},
       {:shouldi, only:  [:dev, :test]}
     ]
   end
 
   defp deps("Linux") do
     [
-      {:elixir_ale, "~>0.3"}
+      {:elixir_ale, "~>0.4"}
     ]
   end
 

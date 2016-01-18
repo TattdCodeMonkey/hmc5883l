@@ -12,11 +12,11 @@ defmodule HMC5883L.Supervisor do
   def init(_) do
     config = HMC5883L.CompassConfiguration.load_from_env
 
-    [
-      worker(HMC5883L.State, [config]),
-      supervisor(HMC5883L.EventSupervisor, []),
-      supervisor(HMC5883L.CompassSupervisor, [])
-    ]
+    Enum.map(Application.get_env(:hmc5883l, :sensors), &sensor_sup/1)
     |> supervise([strategy: :one_for_one, name: name])
+  end
+
+  defp sensor_sup(sensor) do
+    supervisor(HMC5883L.SensorSupervisor, [sensor])
   end
 end

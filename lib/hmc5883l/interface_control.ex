@@ -113,6 +113,6 @@ defmodule HMC5883L.InterfaceControl do
       y_raw :: size(16)-signed
     >> = data
 
-    {:raw_reading, {x_raw, y_raw, z_raw}} |> notify
+    {:raw_reading, {x_raw, y_raw, z_raw}}
   end
 end

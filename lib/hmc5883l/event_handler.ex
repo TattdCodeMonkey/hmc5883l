@@ -1,6 +1,6 @@
 defmodule HMC5883L.EventHandler do
   use GenEvent
-  alias HMC5883L.State
+  alias HMC5883L.SensorState
   import HMC5883L.Utilities
   require Logger
 
@@ -9,46 +9,55 @@ defmodule HMC5883L.EventHandler do
   end
 
   def handle_event(event, args) do
-    process_event(event)
+    process_event(event, args)
 
     {:ok, args}
   end
 
-  defp process_event({:error, error}), do: Logger.warn("Driver error #{error}")
+  defp process_event({:error, error}, _), do: Logger.warn("Driver error #{error}")
 
-  defp process_event({:raw_reading, msg}) do
+  defp process_event({:raw_reading, msg}, args) do
+    update_state({:raw, msg}, args)
+
     {x, y, z} = msg
 
-    {xy_gauss,z_gauss} = State.axis_gauss
+    %{axis_gauss: {xy_gauss,z_gauss}} = SensorState.axis_gauss(args.state_name)
 
     sx = x / xy_gauss * 100
     sy = y / xy_gauss * 100
     sz = z / z_gauss * 100
 
-    {:scaled_reading, {sx, sy, sz}}
-    |> notify
+    GenEvent.notify(args.evtmgr_name, {:scaled_reading, {sx, sy, sz}})
   end
 
-  defp process_event({:scaled_reading, msg}) do
+  defp process_event({:scaled_reading, msg}, args) do
+    update_state({:scaled, msg}, args)
+
     {x, y, _z} = msg
 
     heading = :math.atan2(y,x) |> bearing_to_degrees
 
-    {:heading, heading}
-    |> notify
+    GenEvent.notify(args.evtmgr_name, {:heading, heading})
   end
 
-  defp process_event({type, _} = event)
+  defp process_event({type, _val} = event, args)
     when type in [:heading, :available] do
-    HMC5883L.State.update(event)
+    update_state(event, args)
+    GenEvent.notify(args.evtmgr_name, event)
   end
 
-  defp process_event({type, msg})
+  defp process_event({type, msg}, _args)
     when is_atom(type) do
     Logger.warn("Unknown event received.\nType: #{type}\nMsg: #{inspect msg}")
   end
 
-  defp process_event(event) do
+  defp process_event(event, _args) do
     Logger.warn("Unknown event received.\n#{inspect event}")
+  end
+
+  defp update_state(event, args) do
+    SensorState.update(args.state_name, event)
+
+    event
   end
 end
