@@ -1,5 +1,6 @@
 defmodule HMC5883L.InterfaceControl do
   import HMC5883L.Utilities
+  alias HMC5883L.CompassConfiguration, as: Config
 
   @avg_bit_len    2
   @drate_bit_len  3
@@ -17,11 +18,11 @@ defmodule HMC5883L.InterfaceControl do
     reg_a    = <<cfg_a>>    |> decode_cfga
     reg_b    = <<cfg_b>>    |> decode_cfgb
     reg_mode = <<mode_reg>> |> decode_modereg
-    reg_a |> Map.merge reg_b |> Map.merge reg_mode
+    reg_a |> Map.merge(reg_b) |> Map.merge(reg_mode)
   end
 
-  @spec encode_config(%{}) :: <<_::24>>
-  def encode_config(config) do
+  @spec encode_config(Config.t) :: <<_::24>>
+  def encode_config(%Config{} = config) do
     cfg_a = config |> encode_cfga
     cfg_b = config |> encode_cfgb
     mode_reg = config |> encode_modereg
@@ -34,8 +35,8 @@ defmodule HMC5883L.InterfaceControl do
   ##########
   @spec default_cfga() :: <<_::8>>
   def default_cfga(), do: encode_cfga(8,15,:normal)
-  @spec encode_cfga(%{}) :: <<_::8>>
-  def encode_cfga(%{averaging: avg, data_rate: rate, bias: bias}), do: encode_cfga(avg, rate, bias)
+  @spec encode_cfga(Config.t) :: <<_::8>>
+  def encode_cfga(%Config{averaging: avg, data_rate: rate, bias: bias}), do: encode_cfga(avg, rate, bias)
   @spec encode_cfga(number, number, atom) :: <<_::8>>
   def encode_cfga(avg, rate, bias) do
     bs_avg   = <<enc_samplingavg(avg)::size(@avg_bit_len)>>
@@ -60,8 +61,8 @@ defmodule HMC5883L.InterfaceControl do
   @spec default_cfgb() :: <<_::8>>
   def default_cfgb(), do: encode_cfgb(1.3)
 
-  @spec encode_cfgb(%{}) :: <<_::8>>
-  def encode_cfgb(%{gain: gain}), do: encode_cfgb(gain)
+  @spec encode_cfgb(Config.t) :: <<_::8>>
+  def encode_cfgb(%Config{gain: gain}), do: encode_cfgb(gain)
 
   @spec encode_cfgb(number) :: <<_::8>>
   def encode_cfgb(gain) do
@@ -82,8 +83,8 @@ defmodule HMC5883L.InterfaceControl do
   @spec default_modereg() :: <<_::8>>
   def default_modereg(), do: encode_modereg(:continuous)
 
-  @spec encode_modereg(%{}) :: <<_::8>>
-  def encode_modereg(%{mode: mode}), do: encode_modereg(mode)
+  @spec encode_modereg(Config.t) :: <<_::8>>
+  def encode_modereg(%Config{mode: mode}), do: encode_modereg(mode)
 
   @spec encode_modereg(atom) :: <<_::8>>
   def encode_modereg(mode) do

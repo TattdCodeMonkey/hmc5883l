@@ -1,5 +1,6 @@
 defmodule HMC5883L.SensorSupervisor do
-  use Supervisor	
+  use Supervisor
+  alias HMC5883L.CompassConfiguration, as: Config
 
   def start_link(sensor) do
   	id = String.to_atom("hmc5883l_" <> sensor.name <> "_sup")
@@ -28,13 +29,13 @@ defmodule HMC5883L.SensorSupervisor do
   	    HMC5883L.Sensor, [
   	      %{
   	      	sensor: sensor,
-  	      	config: sensor.config,
+  	      	config: Map.merge(%Config{}, sensor.config),
   	      	state_name: state_name,
   	      	i2c_name: bus_name,
   	      	event_mgr: evtmgr_name,
   	      },
   	      [name: driver_name]
-  	    ],	
+  	    ],
   	    [id: driver_name]
   	  ),
   	  Supervisor.Spec.worker(GenEvent, [[name: evtmgr_name]], [id: evtmgr_name]),
@@ -42,10 +43,10 @@ defmodule HMC5883L.SensorSupervisor do
   	  	MonHandler,
   	  	[
   	  		MonHandler.get_config(
-  	  		  evtmgr_name, 
-  	  		  HMC5883L.EventHandler, 
+  	  		  evtmgr_name,
+  	  		  HMC5883L.EventHandler,
   	  		  %{evtmgr_name: evtmgr_name, state_name: state_name}
-  	  		), 
+  	  		),
   	  		[name: evthan_name]],
   	  	[id: evthan_name]
   	  ),

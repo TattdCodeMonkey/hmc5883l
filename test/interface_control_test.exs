@@ -5,7 +5,7 @@ defmodule HMC5883L.InterfaceControl_Tests do
   alias HMC5883L.CompassConfiguration
 
   test "eating dogfood" do
-    default_config = CompassConfiguration.new()
+    default_config = %CompassConfiguration{}
 
     encoded_config = InterfaceControl.encode_config(default_config)
     decoded_config = InterfaceControl.decode_config(encoded_config)
@@ -18,6 +18,6 @@ defmodule HMC5883L.InterfaceControl_Tests do
   end
 
   test "decode heading" do
-    
+
   end
-end  
+end

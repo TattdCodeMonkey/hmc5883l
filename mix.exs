@@ -31,7 +31,7 @@ defmodule Hmc5883l.Mixfile do
       {:mon_handler, "~>1.0"},
       {:multidef, "~>0.2"},
       {:dialyze, "~> 0.1.4", optional: true},
-      {:shouldi, only:  [:dev, :test]}
+      {:shouldi, "~> 0.3",only:  [:dev, :test]}
     ]
   end
 

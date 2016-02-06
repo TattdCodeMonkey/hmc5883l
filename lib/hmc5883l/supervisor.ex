@@ -10,8 +10,6 @@ defmodule HMC5883L.Supervisor do
 
   @spec init(term) :: :ignore | {:ok, term}
   def init(_) do
-    config = HMC5883L.CompassConfiguration.load_from_env
-
     Enum.map(Application.get_env(:hmc5883l, :sensors), &sensor_sup/1)
     |> supervise([strategy: :one_for_one, name: name])
   end
