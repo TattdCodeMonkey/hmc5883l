@@ -4,9 +4,12 @@ defmodule Hmc5883l.Mixfile do
   def project do
     [app: :hmc5883l,
      version: "0.5.0",
-     elixir: "~> 1.0",
-     deps: deps ++ deps(operating_system),
-     package: package()
+     elixir: ">= 1.0.0 and < 2.0.0",
+     build_embedded: Mix.env == :prod,
+     start_permanent: Mix.env == :prod,
+     deps: deps,
+     description: description,
+     package: package,
     ]
   end
 
@@ -26,47 +29,24 @@ defmodule Hmc5883l.Mixfile do
       links: [{"Github", "https://github.com/tattdcodemonkey/hmc5883l"}]]
   end
 
+  def description, do: """
+  OTP application for reading the HMC5883L magnetometer.
+
+  Magnetic heading is read at approx. 13hz (every 75ms)
+  """
+
   defp deps do
     [
       {:mon_handler, "~>1.0"},
       {:multidef, "~>0.2"},
       {:dialyze, "~> 0.1.4", optional: true},
-      {:shouldi, "~> 0.3",only:  [:dev, :test]}
-    ]
+      {:shouldi, "~> 0.3", only:  [:dev, :test]}
+    ] ++ additional_deps(Mix.env)
   end
 
-  defp deps("Linux") do
-    [
-      {:elixir_ale, "~>0.4"}
-    ]
-  end
+  defp additional_deps(:test), do: []
+  defp additional_deps(_), do: [
+    {:elixir_ale, "~>0.4"}
+  ]
 
-  defp deps("Darwin") do
-    []
-  end
-
-  defp deps(_) do
-    []
-  end
-
-  def operating_system do
-    case Application.get_env(:hmc5883l, :operating_system) do
-      nil ->
-        Port.open({:spawn, "uname"}, [])
-
-        os = receive do
-          {_port, {:data, result}} -> result
-          error -> error
-        end
-
-        result = os
-        |> to_string
-        |> String.replace("\n", "")
-
-        :application.set_env(:hmc5883l, :operating_system, result)
-
-        result
-      os_value -> os_value
-    end
-  end
 end
