@@ -23,10 +23,12 @@ defmodule Hmc5883l.Mixfile do
   end
 
   defp package do
-    [files: ["lib", "mix.exs", "README.md", "LICENSE"],
+    [
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
       maintainers: ["Rodney Norris"],
       licenses: ["Apache 2.0"],
-      links: [{"Github", "https://github.com/tattdcodemonkey/hmc5883l"}]]
+      links: %{"GitHub" =>  "https://github.com/tattdcodemonkey/hmc5883l"}
+    ]
   end
 
   def description, do: """
