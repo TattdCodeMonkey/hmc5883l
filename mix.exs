@@ -32,7 +32,7 @@ defmodule Hmc5883l.Mixfile do
   end
 
   def description, do: """
-  OTP application for reading the HMC5883L magnetometer.
+  OTP application for reading the HMC5883L 3-axis magnetometer.
 
   Magnetic heading is read at approx. 13hz (every 75ms)
   """
@@ -41,8 +41,7 @@ defmodule Hmc5883l.Mixfile do
     [
       {:mon_handler, "~>1.0"},
       {:multidef, "~>0.2"},
-      {:dialyze, "~> 0.1.4", optional: true},
-      {:shouldi, "~> 0.3", only:  [:dev, :test]}
+      {:dialyze, "~> 0.1.4", optional: true}
     ] ++ additional_deps(Mix.env)
   end
 
