@@ -106,7 +106,7 @@ defmodule HMC5883L.InterfaceControl do
   @doc """
   Takes the 6 byte heading reading from compass and decodes to a decimal degrees angle using the current gain scale value.
   """
-  @spec decode_heading(<<_ :: 48>>) :: atom
+  @spec decode_heading(<<_ :: 48>>) :: {:raw_reading, {integer, integer, integer}}
   def decode_heading(data) do
     <<
       x_raw :: size(16)-signed,

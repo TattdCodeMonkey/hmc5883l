@@ -2,19 +2,19 @@ defmodule HMC5883L.SensorSupervisor do
   use Supervisor
   alias HMC5883L.CompassConfiguration, as: Config
 
+  @spec start_link(map) :: Supervisor.on_start
   def start_link(sensor) do
   	id = String.to_atom("hmc5883l_" <> sensor.name <> "_sup")
 
-  	Supervisor.start_link(__MODULE__, [sensor: sensor, name: id], [id: id])
+  	Supervisor.start_link(__MODULE__, [sensor: sensor], [name: id])
   end
 
   def init(opts) do
   	sensor = Keyword.get(opts, :sensor)
-  	name = Keyword.get(opts, :name)
 
   	sensor
   	|> children
-  	|> supervise([strategy: :one_for_one, name: name])
+  	|> supervise([strategy: :one_for_one])
   end
 
   defp children(sensor) do
