@@ -1,6 +1,8 @@
 HMC5883L
 ========
 [![Build Status](https://travis-ci.org/TattdCodeMonkey/hmc5883l.png?branch=master)](https://travis-ci.org/TattdCodeMonkey/hmc5883l)
+[![Hex version](https://img.shields.io/hexpm/v/hmc5883l.svg "Hex
+version")](https://hex.pm/packages/hmc5883l)
 
 This is an OTP application for reading the HMC5883L magnetic compass. It utilizes elixir_ale for configuring and reading the compass over i2c bus.
 
@@ -41,13 +43,16 @@ config :hmc5883l, sensors: [
 Available in Hex, the package can be installed as:
 
   1. Add hmc5883l to your list of dependencies in `mix.exs`:
-
+    ```elixir
         def deps do
           [{:hmc5883l, "~> 0.5.0"}]
         end
+    ```
 
   2. Ensure hmc5883l is started before your application:
 
+    ```elixir  
         def application do
           [applications: [:hmc5883l]]
         end
+    ```
