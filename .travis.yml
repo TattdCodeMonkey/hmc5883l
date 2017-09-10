@@ -1,16 +1,9 @@
-language: erlang
+language: elixir
 notifications:
   recipients:
     - rodney@tattdcodemonkey.com
 otp_release:
-  - 17.0
-env:
-  - ELIXIR="v1.0.2"
-install: mix deps.get
-before_install:
-  - mkdir -p vendor/elixir
-  - wget -q https://github.com/elixir-lang/elixir/releases/download/$ELIXIR/Precompiled.zip && unzip -qq Precompiled.zip -d vendor/elixir
-  - export PATH="$PATH:$PWD/vendor/elixir/bin"
-  - export MIX_ENV=test
-  - mix local.hex --force
-script: "mix do deps.get, test --no-start"
+  - 20.0
+sudo: false
+script:
+  - mix test --no-start
