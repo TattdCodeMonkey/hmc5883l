@@ -1,6 +1,5 @@
 HMC5883L
 ========
-[![Build Status](https://travis-ci.org/TattdCodeMonkey/hmc5883l.png?branch=master)](https://travis-ci.org/TattdCodeMonkey/hmc5883l)
 [![Hex version](https://img.shields.io/hexpm/v/hmc5883l.svg "Hex
 version")](https://hex.pm/packages/hmc5883l)
 

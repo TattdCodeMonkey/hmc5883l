@@ -1,9 +1,0 @@
-language: elixir
-notifications:
-  recipients:
-    - rodney@tattdcodemonkey.com
-otp_release:
-  - 20.0
-sudo: false
-script:
-  - mix test --no-start
